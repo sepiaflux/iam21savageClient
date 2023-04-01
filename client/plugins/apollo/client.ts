@@ -1,20 +1,8 @@
 import { ApolloClient, InMemoryCache, from } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context'
-import { onError } from '@apollo/client/link/error'
 import { RetryLink } from '@apollo/client/link/retry'
-import json from './possibleTypes.json'
 
 const cache = new InMemoryCache()
-
-function getProductionBranchUrl () {
-  if (import.meta.env.VITE_APP_BRANCH === 'dev') {
-    return 'https://bausicht-dev.herokuapp.com/graphql'
-  } else if (import.meta.env.VITE_APP_BRANCH === 'staging') {
-    return 'https://bausicht-staging.herokuapp.com/graphql'
-  } else {
-    return 'https://bausicht.herokuapp.com/graphql'
-  }
-}
 
 const retryLink = new RetryLink({
   delay: {
@@ -49,5 +37,5 @@ const authLink = setContext((_, { headers }) => {
 
 export default new ApolloClient({
   cache,
-  link: from([errorLink, retryLink, authLink.concat(uploadLink)])
+  link: from([retryLink, authLink])
 })

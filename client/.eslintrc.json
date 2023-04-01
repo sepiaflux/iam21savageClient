@@ -15,14 +15,10 @@
     },
     "ignorePatterns": ["**/graphql.ts"],
     "rules": {
-        // This was done, as nuxt automatically names components with long names based on folder structure
-        "vue/multi-word-component-names": "off",
-        // This is done because we use reactivityTransform
-        // https://github.com/vuejs/rfcs/discussions/369
-        "vue/no-setup-props-destructure": "off",
+
         "no-console": "warn",
         //This is a weird bug, I do not know why I need to disable this, this should not be in vue 3 recommended
-        "vue/no-v-model-argument": "off",
+        // "vue/no-v-model-argument": "off",
         "@typescript-eslint/no-unused-vars": "off",
 		"unused-imports/no-unused-imports": "error",
 		"unused-imports/no-unused-vars": [
@@ -30,4 +26,5 @@
 			{ "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
 		]
     }
+    
 }

@@ -1,0 +1,37 @@
+{
+    "schema": "http://localhost:5000/graphql",
+    "documents": "./**/*.graphql",
+    "overwrite": true,
+    "generates": {
+      "./graphql/generated/graphql.ts": {
+        "hooks": null,
+        "afterOneFileWrite": [
+          "eslint --fix"
+        ],
+        "config": {
+          "withCompositionFunctions": true,
+          "vueCompositionApiImportFrom": "vue"
+        },
+        "plugins": [
+          "typescript",
+          "typescript-operations",
+          "typescript-vue-apollo"
+        ]
+      },
+      "./graphql.schema.json": {
+        "plugins": [
+          "introspection"
+        ]
+      },
+      "./plugins/apollo/possibleTypes.json": {
+        "plugins": [
+          "fragment-matcher"
+        ]
+      },
+      "./schema.graphql": {
+        "plugins": [
+          "schema-ast"
+        ]
+      }
+    }
+  }

@@ -15,13 +15,35 @@
           <h3 class="text-lg text-gray-300">
             Rap Text - First Player:
           </h3>
-          <p class="mt-4 text-lg text-gray-300">
+          <p v-if="rapTextFirstPlayer" class="mt-4 text-lg text-gray-300">
             {{ rapTextFirstPlayer }}
+          </p>
+          <p v-else class="mt-4 text-lg text-gray-300">
+            No rap text available for the first player.
           </p>
           <h3 class="mt-10 text-lg text-gray-300">
             Audio - First Player:
           </h3>
-          <audio class="mt-4" controls :src="audioURLFirstPlayer">Your browser does not support the audio element.</audio>
+          <audio v-if="audioURLFirstPlayer" :key="audioURLFirstPlayer" class="mt-4" controls :src="audioURLFirstPlayer">Your browser does not support the audio element.</audio>
+          <p v-else class="mt-4 text-lg text-gray-300">
+            No audio available for the first player.
+          </p>
+          <h3 class="mt-10 text-lg text-gray-300">
+            Rap Text - Second Player:
+          </h3>
+          <p v-if="rapTextSecondPlayer" class="mt-4 text-lg text-gray-300">
+            {{ rapTextSecondPlayer }}
+          </p>
+          <p v-else class="mt-4 text-lg text-gray-300">
+            No rap text available for the second player.
+          </p>
+          <h3 class="mt-10 text-lg text-gray-300">
+            Audio - Second Player:
+          </h3>
+          <audio v-if="audioURLSecondPlayer" :key="audioURLSecondPlayer" class="mt-4" controls :src="audioURLSecondPlayer">Your browser does not support the audio element.</audio>
+          <p v-else class="mt-4 text-lg text-gray-300">
+            No audio available for the second player.
+          </p>
         </div>
       </div>
     </div>
@@ -29,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useGetBattleQuery } from '~~/graphql/generated/graphql'
 
 const battleId = localStorage.getItem('battleId') as string
@@ -37,11 +59,25 @@ const { result, loading, error } = useGetBattleQuery({ id: battleId })
 
 const rapTextFirstPlayer = ref('')
 const audioURLFirstPlayer = ref('')
+const rapTextSecondPlayer = ref('')
+const audioURLSecondPlayer = ref('')
+
+watch(result, (newValue) => {
+  if (!loading.value && !error.value && newValue) {
+    rapTextFirstPlayer.value = newValue.battle?.rapTextFirstPlayer || ''
+    audioURLFirstPlayer.value = newValue.battle?.audioURLFirstPlayer || ''
+    rapTextSecondPlayer.value = newValue.battle?.rapTextSecondPlayer || ''
+    audioURLSecondPlayer.value =
+    newValue.battle?.audioURLSecondPlayer || ''
+  }
+})
 
 onMounted(() => {
   if (!loading.value && !error.value && result.value) {
     rapTextFirstPlayer.value = result.value.battle?.rapTextFirstPlayer || ''
     audioURLFirstPlayer.value = result.value.battle?.audioURLFirstPlayer || ''
+    rapTextSecondPlayer.value = result.value.battle?.rapTextSecondPlayer || ''
+    audioURLSecondPlayer.value = result.value.battle?.audioURLSecondPlayer || ''
   }
 })
 </script>

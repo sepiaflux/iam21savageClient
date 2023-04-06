@@ -2,6 +2,8 @@ import { ApolloClient, InMemoryCache, from } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context'
 import { RetryLink } from '@apollo/client/link/retry'
 
+import { HttpLink } from '@apollo/client'
+
 const cache = new InMemoryCache()
 
 const retryLink = new RetryLink({
@@ -18,24 +20,20 @@ const retryLink = new RetryLink({
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
-  const deprecatedToken = localStorage.getItem('magpieToken')
-  let token = localStorage.getItem('bausichtToken')
-  if (!token && deprecatedToken) {
-    token = deprecatedToken
-    localStorage.setItem('bausichtToken', deprecatedToken)
-  }
-  const siteId = localStorage.getItem('siteId')
-  // return the headers to the context so httpLink can read them
+  const token = localStorage.getItem('userToken')
   return {
     headers: {
       ...headers,
-      authorization: token ? `${token}` : '',
-      siteId: siteId ? `${siteId}` : ''
+      authorization: token ? `${token}` : ''
     }
   }
 })
 
+const httpLink = new HttpLink({
+  uri: 'http://localhost:5000/graphql'
+})
+
 export default new ApolloClient({
   cache,
-  link: from([retryLink, authLink])
+  link: from([retryLink, authLink, httpLink])
 })

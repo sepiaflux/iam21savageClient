@@ -1,0 +1,169 @@
+type Battle {
+  attribute1FirstPlayer: String
+  attribute1SecondPlayer: String
+  attribute2FirstPlayer: String
+  attribute2SecondPlayer: String
+  attribute3FirstPlayer: String
+  attribute3SecondPlayer: String
+  firstPlayer: User!
+  game: Game!
+  id: String!
+  rapTextFirstPlayer: String
+  rapTextSecondPlayer: String
+  roundIndex: Int!
+  secondPlayer: User!
+  winner: User
+}
+
+input BattleCreateInput {
+  attribute1FirstPlayer: String
+  attribute1SecondPlayer: String
+  attribute2FirstPlayer: String
+  attribute2SecondPlayer: String
+  attribute3FirstPlayer: String
+  attribute3SecondPlayer: String
+  firstPlayerId: ID!
+  gameId: ID!
+  rapTextFirstPlayer: String
+  rapTextSecondPlayer: String
+  roundIndex: Int!
+  secondPlayerId: ID!
+  winnerUserId: String
+}
+
+type BattleCreatePayload {
+  battle: Battle!
+}
+
+input BattleUpdateInput {
+  attribute1FirstPlayer: String
+  attribute1SecondPlayer: String
+  attribute2FirstPlayer: String
+  attribute2SecondPlayer: String
+  attribute3FirstPlayer: String
+  attribute3SecondPlayer: String
+  battle: Int
+  firstPlayerId: ID
+  gameId: ID
+  rapTextFirstPlayer: String
+  rapTextSecondPlayer: String
+  secondPlayerId: ID
+  winnerUserId: ID
+}
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
+
+scalar DateTime
+
+type Game {
+  battles: [Battle!]!
+  gameCode: String!
+  gameOwner: User!
+  id: String!
+  numberOfRounds: Int!
+  roundIndex: Int!
+  state: GameState!
+  users: [User!]!
+}
+
+type GameCreatePayload {
+  user: User!
+}
+
+type GameJoinPayload {
+  user: User!
+}
+
+type GameStartPayload {
+  battles: [Battle!]!
+  game: Game!
+}
+
+enum GameState {
+  FinalScreen
+  PlayingBattles
+  WaitingToJoin
+}
+
+type Mutation {
+  """employee gets created instantly (and if eMail then invited)"""
+  battleCreate(input: battleCreateInput!): BattleCreatePayload
+
+  """game gets created instantly (and if eMail then invited)"""
+  gameCreate(input: gameCreateInput!): GameCreatePayload
+
+  """game gets created instantly (and if eMail then invited)"""
+  gameJoin(input: gameJoinInput!): GameJoinPayload
+
+  """game gets created instantly (and if eMail then invited)"""
+  gameStart(input: gameStartInput!): GameStartPayload
+
+  """user gets created instantly (and if eMail then invited)"""
+  userCreate(input: userCreateInput!): UserCreatePayload
+}
+
+type Query {
+  battle(id: String!): Battle
+  user(id: ID!): User
+}
+
+type Subscription {
+  battleCreated: Battle
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type User {
+  avatar: String
+  deviceId: String!
+  game: Game!
+  id: String!
+  name: String!
+  owner: Boolean!
+  score: Int!
+}
+
+"""User already exists and gets invited"""
+input UserCreateInput {
+  avatar: String
+  deviceId: String!
+  name: String!
+}
+
+type UserCreatePayload {
+  user: User!
+}
+
+input UserUpdateInput {
+  avatar: String
+  deviceId: String
+  gameId: String
+  name: String
+  score: Int
+}
+
+input battleCreateInput {
+  battle: BattleCreateInput!
+}
+
+input gameCreateInput {
+  numberOfRounds: Int
+  ownerUser: UserCreateInput!
+}
+
+input gameJoinInput {
+  gameId: ID!
+  user: UserCreateInput!
+}
+
+input gameStartInput {
+  gameId: ID!
+}
+
+input userCreateInput {
+  user: UserCreateInput!
+}

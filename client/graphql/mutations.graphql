@@ -1,0 +1,7 @@
+mutation gameCreate($input: gameCreateInput!) {
+  gameCreate(input: $input) {
+    user {
+      ...UserInfo
+    }
+  }
+}

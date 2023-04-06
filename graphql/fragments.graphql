@@ -2,12 +2,62 @@ fragment UserInfo on User {
   id
   name
   owner
+  score
+  avatar
+  deviceId
+}
+
+fragment UserGameInfo on User {
+  ...UserInfo
   game {
     ...GameInfo
   }
 }
 
 fragment GameInfo on Game {
-    id
-    gameCode
+  id
+  gameCode
+  numberOfRounds
+  roundIndex
+  state
+}
+
+fragment GameUsersInfo on Game {
+  ...GameInfo
+  users {
+    ...UserInfo
+  }
+}
+
+fragment BattleInfo on Battle {
+  id
+  attribute1FirstPlayer
+  attribute1SecondPlayer
+  attribute2FirstPlayer
+  attribute2SecondPlayer
+  attribute3FirstPlayer
+  attribute3SecondPlayer
+  audioURLFirstPlayer
+  audioURLSecondPlayer
+  firstPlayer {
+    ...UserInfo
+  }
+  secondPlayer {
+    ...UserInfo
+  }
+  game {
+    ...GameInfo
+  }
+  rapTextFirstPlayer
+  rapTextSecondPlayer
+  roundIndex
+  votesFirstPlayer
+  votesSecondPlayer
+}
+
+fragment GameBattlesInfo on Game {
+  ...GameInfo
+  battles {
+    ...BattleInfo
+  }
 }

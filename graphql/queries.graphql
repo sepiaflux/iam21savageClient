@@ -1,0 +1,45 @@
+query GetGame($gameId: ID!) {
+  game(gameId: $gameId) {
+    ...GameInfo
+    numberOfRounds
+    roundIndex
+    state
+    users {
+      ...UserInfo
+    }
+  }
+}
+
+query GetUser($id: ID!) {
+  user(id: $id) {
+    ...UserInfo
+  }
+}
+
+query GetBattle($id: ID!) {
+  battle(id: $id) {
+    attribute1FirstPlayer
+    attribute1SecondPlayer
+    attribute2FirstPlayer
+    attribute2SecondPlayer
+    attribute3FirstPlayer
+    attribute3SecondPlayer
+    audioURLFirstPlayer
+    audioURLSecondPlayer
+    firstPlayer {
+      ...UserInfo
+    }
+    game {
+      ...GameInfo
+    }
+    id
+    rapTextFirstPlayer
+    rapTextSecondPlayer
+    roundIndex
+    secondPlayer {
+      ...UserInfo
+    }
+    votesFirstPlayer
+    votesSecondPlayer
+  }
+}

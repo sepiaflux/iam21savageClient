@@ -5,6 +5,12 @@ type Battle {
   attribute2SecondPlayer: String
   attribute3FirstPlayer: String
   attribute3SecondPlayer: String
+
+  """we use a service for this so this is the link to that service"""
+  audioURLFirstPlayer: String
+
+  """we use a service for this so this is the link to that service"""
+  audioURLSecondPlayer: String
   firstPlayer: User!
   game: Game!
   id: String!
@@ -12,7 +18,8 @@ type Battle {
   rapTextSecondPlayer: String
   roundIndex: Int!
   secondPlayer: User!
-  winner: User
+  votesFirstPlayer: Int!
+  votesSecondPlayer: Int!
 }
 
 input BattleCreateInput {
@@ -28,10 +35,9 @@ input BattleCreateInput {
   rapTextSecondPlayer: String
   roundIndex: Int!
   secondPlayerId: ID!
-  winnerUserId: String
 }
 
-type BattleCreatePayload {
+type BattleSubmitPayload {
   battle: Battle!
 }
 
@@ -48,7 +54,11 @@ input BattleUpdateInput {
   rapTextFirstPlayer: String
   rapTextSecondPlayer: String
   secondPlayerId: ID
-  winnerUserId: ID
+  votesFirstPlayer: Int
+}
+
+type BattleVotePayload {
+  battle: Battle!
 }
 
 """
@@ -61,12 +71,16 @@ scalar DateTime
 type Game {
   battles: [Battle!]!
   gameCode: String!
-  gameOwner: User!
   id: String!
   numberOfRounds: Int!
   roundIndex: Int!
   state: GameState!
   users: [User!]!
+}
+
+input GameCreateInput {
+  numberOfRounds: Int
+  ownerUser: UserCreateInput!
 }
 
 type GameCreatePayload {
@@ -83,35 +97,37 @@ type GameStartPayload {
 }
 
 enum GameState {
+  Battle
   FinalScreen
-  PlayingBattles
+  Prompt
+  Results
+  Voting
   WaitingToJoin
 }
 
 type Mutation {
   """employee gets created instantly (and if eMail then invited)"""
-  battleCreate(input: battleCreateInput!): BattleCreatePayload
+  battleSubmit(input: battleSubmitInput!): BattleSubmitPayload
+
+  """employee gets created instantly (and if eMail then invited)"""
+  battleVote(input: battleVoteInput!): BattleVotePayload
 
   """game gets created instantly (and if eMail then invited)"""
-  gameCreate(input: gameCreateInput!): GameCreatePayload
+  gameCreate(input: GameCreateInput!): GameCreatePayload
 
   """game gets created instantly (and if eMail then invited)"""
   gameJoin(input: gameJoinInput!): GameJoinPayload
 
   """game gets created instantly (and if eMail then invited)"""
   gameStart(input: gameStartInput!): GameStartPayload
-
-  """user gets created instantly (and if eMail then invited)"""
-  userCreate(input: userCreateInput!): UserCreatePayload
 }
 
 type Query {
-  battle(id: String!): Battle
-  user(id: ID!): User
-}
+  battle(id: ID!): Battle
 
-type Subscription {
-  battleCreated: Battle
+  """if no game ID is given, the game is returned, if he has one!"""
+  game(gameId: ID!): Game
+  user(id: ID!): User
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -130,12 +146,7 @@ type User {
 """User already exists and gets invited"""
 input UserCreateInput {
   avatar: String
-  deviceId: String!
   name: String!
-}
-
-type UserCreatePayload {
-  user: User!
 }
 
 input UserUpdateInput {
@@ -146,13 +157,18 @@ input UserUpdateInput {
   score: Int
 }
 
-input battleCreateInput {
-  battle: BattleCreateInput!
+input battleSubmitInput {
+  attribute1: String!
+  attribute2: String!
+  attribute3: String!
+  battleId: ID!
+  deviceId: String!
 }
 
-input gameCreateInput {
-  numberOfRounds: Int
-  ownerUser: UserCreateInput!
+input battleVoteInput {
+  battleId: ID!
+  voteeId: ID!
+  voterId: ID!
 }
 
 input gameJoinInput {
@@ -162,8 +178,4 @@ input gameJoinInput {
 
 input gameStartInput {
   gameId: ID!
-}
-
-input userCreateInput {
-  user: UserCreateInput!
 }

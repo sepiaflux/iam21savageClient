@@ -37,7 +37,9 @@ import { GameState, User as UserType, useGameStartMutation, useGetBattleViewerQu
 
 const gameId = localStorage.getItem('gameId') as string
 const { result, loading, error } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
-const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })
+
+const viewerId = localStorage.getItem('viewerId') as string
+const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
 
 const gameCode = ref('Loading...')
 
@@ -50,15 +52,15 @@ watch(result, (newValue) => {
     gameCode.value = newValue.game.gameCode || 'GameCode Fehler'
     users.value = newValue.game.users || []
     gameState.value = newValue.game.state
-    if (newValue.game.state === GameState.Prompt) {
-      const viewerId = localStorage.getItem('viewerId') as string
-      if (result?.value?.battleViewer?.id) {
-        localStorage.setItem('battleId', result.value.battleViewer.id)
-        navigateTo('/battleSubmit')
-      } else { throw new Error('Game startet but this users battle has not been found') }
-    }
   }
 }, { immediate: true })
+
+watch([result, resultBattleViewerQuery], ([gameResult, battleViewerResult]) => {
+  if (gameResult?.game && gameResult.game.state === GameState.Prompt && battleViewerResult?.battleViewer?.id) {
+    localStorage.setItem('battleId', battleViewerResult.battleViewer.id)
+    navigateTo('/battleSubmit')
+  }
+})
 
 const { mutate, loading: startGameLoading } = useGameStartMutation()
 

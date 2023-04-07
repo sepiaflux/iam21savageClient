@@ -83,6 +83,7 @@ function createRoom () {
   })
     .then((res) => {
       if (res?.data?.gameCreate?.user.game.id) {
+        localStorage.setItem('viewerId', res.data.gameCreate.user.id)
         localStorage.setItem('gameId', res.data.gameCreate.user.game.id)
       }
       navigateTo('/lobby')

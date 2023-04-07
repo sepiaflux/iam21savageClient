@@ -18,28 +18,24 @@ query GetUser($id: ID!) {
 
 query GetBattle($id: ID!) {
   battle(id: $id) {
-    attribute1FirstPlayer
-    attribute1SecondPlayer
-    attribute2FirstPlayer
-    attribute2SecondPlayer
-    attribute3FirstPlayer
-    attribute3SecondPlayer
-    audioURLFirstPlayer
-    audioURLSecondPlayer
-    firstPlayer {
-      ...UserInfo
-    }
-    game {
-      ...GameInfo
-    }
-    id
-    rapTextFirstPlayer
-    rapTextSecondPlayer
-    roundIndex
-    secondPlayer {
-      ...UserInfo
-    }
-    votesFirstPlayer
-    votesSecondPlayer
+    ...BattleInfo
+  }
+}
+
+query GetBattles {
+  battles {
+    ...BattleInfo
+  }
+}
+
+query GetBattleViewer($userId: ID!) {
+  battleViewer(userId: $userId) {
+    ...BattleInfo
+  }
+}
+
+query GetViewer {
+  viewer {
+    ...UserInfo
   }
 }

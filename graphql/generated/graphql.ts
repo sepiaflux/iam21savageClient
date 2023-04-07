@@ -83,6 +83,11 @@ export type BattleVotePayload = {
   battle: Battle;
 };
 
+export type ConnectToCloudFuncPayload = {
+  __typename?: 'ConnectToCloudFuncPayload';
+  message?: Maybe<Scalars['String']>;
+};
+
 export type Game = {
   __typename?: 'Game';
   battles: Array<Battle>;
@@ -131,6 +136,8 @@ export type Mutation = {
   /** employee gets created instantly (and if eMail then invited) */
   battleVote?: Maybe<BattleVotePayload>;
   /** game gets created instantly (and if eMail then invited) */
+  connectToCloudFunc?: Maybe<ConnectToCloudFuncPayload>;
+  /** game gets created instantly (and if eMail then invited) */
   gameCreate?: Maybe<GameCreatePayload>;
   /** game gets created instantly (and if eMail then invited) */
   gameJoin?: Maybe<GameJoinPayload>;
@@ -166,14 +173,22 @@ export type MutationGameStartArgs = {
 export type Query = {
   __typename?: 'Query';
   battle?: Maybe<Battle>;
+  battleViewer?: Maybe<Battle>;
+  battles: Array<Battle>;
   /** if no game ID is given, the game is returned, if he has one! */
   game?: Maybe<Game>;
   user?: Maybe<User>;
+  viewer?: Maybe<User>;
 };
 
 
 export type QueryBattleArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryBattleViewerArgs = {
+  userId: Scalars['ID'];
 };
 
 
@@ -226,7 +241,7 @@ export type BattleVoteInput = {
 };
 
 export type GameJoinInput = {
-  gameId: Scalars['ID'];
+  gameCode: Scalars['ID'];
   user: UserCreateInput;
 };
 
@@ -300,7 +315,24 @@ export type GetBattleQueryVariables = Exact<{
 }>;
 
 
-export type GetBattleQuery = { __typename?: 'Query', battle?: { __typename?: 'Battle', attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, id: string, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string } } | null };
+export type GetBattleQuery = { __typename?: 'Query', battle?: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } | null };
+
+export type GetBattlesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBattlesQuery = { __typename?: 'Query', battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> };
+
+export type GetBattleViewerQueryVariables = Exact<{
+  userId: Scalars['ID'];
+}>;
+
+
+export type GetBattleViewerQuery = { __typename?: 'Query', battleViewer?: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } | null };
+
+export type GetViewerQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetViewerQuery = { __typename?: 'Query', viewer?: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string } | null };
 
 export const UserInfoFragmentDoc = gql`
     fragment UserInfo on User {
@@ -605,33 +637,10 @@ export type GetUserQueryCompositionFunctionResult = VueApolloComposable.UseQuery
 export const GetBattleDocument = gql`
     query GetBattle($id: ID!) {
   battle(id: $id) {
-    attribute1FirstPlayer
-    attribute1SecondPlayer
-    attribute2FirstPlayer
-    attribute2SecondPlayer
-    attribute3FirstPlayer
-    attribute3SecondPlayer
-    audioURLFirstPlayer
-    audioURLSecondPlayer
-    firstPlayer {
-      ...UserInfo
-    }
-    game {
-      ...GameInfo
-    }
-    id
-    rapTextFirstPlayer
-    rapTextSecondPlayer
-    roundIndex
-    secondPlayer {
-      ...UserInfo
-    }
-    votesFirstPlayer
-    votesSecondPlayer
+    ...BattleInfo
   }
 }
-    ${UserInfoFragmentDoc}
-${GameInfoFragmentDoc}`;
+    ${BattleInfoFragmentDoc}`;
 
 /**
  * __useGetBattleQuery__
@@ -655,3 +664,87 @@ export function useGetBattleLazyQuery(variables: GetBattleQueryVariables | VueCo
   return VueApolloComposable.useLazyQuery<GetBattleQuery, GetBattleQueryVariables>(GetBattleDocument, variables, options);
 }
 export type GetBattleQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetBattleQuery, GetBattleQueryVariables>;
+export const GetBattlesDocument = gql`
+    query GetBattles {
+  battles {
+    ...BattleInfo
+  }
+}
+    ${BattleInfoFragmentDoc}`;
+
+/**
+ * __useGetBattlesQuery__
+ *
+ * To run a query within a Vue component, call `useGetBattlesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBattlesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetBattlesQuery();
+ */
+export function useGetBattlesQuery(options: VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GetBattlesQuery, GetBattlesQueryVariables>(GetBattlesDocument, {}, options);
+}
+export function useGetBattlesLazyQuery(options: VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GetBattlesQuery, GetBattlesQueryVariables>(GetBattlesDocument, {}, options);
+}
+export type GetBattlesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetBattlesQuery, GetBattlesQueryVariables>;
+export const GetBattleViewerDocument = gql`
+    query GetBattleViewer($userId: ID!) {
+  battleViewer(userId: $userId) {
+    ...BattleInfo
+  }
+}
+    ${BattleInfoFragmentDoc}`;
+
+/**
+ * __useGetBattleViewerQuery__
+ *
+ * To run a query within a Vue component, call `useGetBattleViewerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBattleViewerQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetBattleViewerQuery({
+ *   userId: // value for 'userId'
+ * });
+ */
+export function useGetBattleViewerQuery(variables: GetBattleViewerQueryVariables | VueCompositionApi.Ref<GetBattleViewerQueryVariables> | ReactiveFunction<GetBattleViewerQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GetBattleViewerQuery, GetBattleViewerQueryVariables>(GetBattleViewerDocument, variables, options);
+}
+export function useGetBattleViewerLazyQuery(variables: GetBattleViewerQueryVariables | VueCompositionApi.Ref<GetBattleViewerQueryVariables> | ReactiveFunction<GetBattleViewerQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GetBattleViewerQuery, GetBattleViewerQueryVariables>(GetBattleViewerDocument, variables, options);
+}
+export type GetBattleViewerQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetBattleViewerQuery, GetBattleViewerQueryVariables>;
+export const GetViewerDocument = gql`
+    query GetViewer {
+  viewer {
+    ...UserInfo
+  }
+}
+    ${UserInfoFragmentDoc}`;
+
+/**
+ * __useGetViewerQuery__
+ *
+ * To run a query within a Vue component, call `useGetViewerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetViewerQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetViewerQuery();
+ */
+export function useGetViewerQuery(options: VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GetViewerQuery, GetViewerQueryVariables>(GetViewerDocument, {}, options);
+}
+export function useGetViewerLazyQuery(options: VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GetViewerQuery, GetViewerQueryVariables>(GetViewerDocument, {}, options);
+}
+export type GetViewerQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetViewerQuery, GetViewerQueryVariables>;

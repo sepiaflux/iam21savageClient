@@ -61,6 +61,10 @@ type BattleVotePayload {
   battle: Battle!
 }
 
+type ConnectToCloudFuncPayload {
+  message: String
+}
+
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -113,6 +117,9 @@ type Mutation {
   battleVote(input: battleVoteInput!): BattleVotePayload
 
   """game gets created instantly (and if eMail then invited)"""
+  connectToCloudFunc: ConnectToCloudFuncPayload
+
+  """game gets created instantly (and if eMail then invited)"""
   gameCreate(input: GameCreateInput!): GameCreatePayload
 
   """game gets created instantly (and if eMail then invited)"""
@@ -124,10 +131,13 @@ type Mutation {
 
 type Query {
   battle(id: ID!): Battle
+  battleViewer(userId: ID!): Battle
+  battles: [Battle!]!
 
   """if no game ID is given, the game is returned, if he has one!"""
   game(gameId: ID!): Game
   user(id: ID!): User
+  viewer: User
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -172,7 +182,7 @@ input battleVoteInput {
 }
 
 input gameJoinInput {
-  gameId: ID!
+  gameCode: ID!
   user: UserCreateInput!
 }
 

@@ -33,20 +33,30 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { User as UserType, useGameStartMutation, useGetGameQuery } from '~~/graphql/generated/graphql'
+import { GameState, User as UserType, useGameStartMutation, useGetBattleViewerQuery, useGetGameQuery } from '~~/graphql/generated/graphql'
 
 const gameId = localStorage.getItem('gameId') as string
 const { result, loading, error } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
+const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })
 
 const gameCode = ref('Loading...')
 
 type User = Omit<UserType, 'game'>
 const users = ref<User[]>([])
+const gameState = ref<GameState | null>(null)
 
 watch(result, (newValue) => {
   if (newValue && newValue.game) {
     gameCode.value = newValue.game.gameCode || 'GameCode Fehler'
     users.value = newValue.game.users || []
+    gameState.value = newValue.game.state
+    if (newValue.game.state === GameState.Prompt) {
+      const viewerId = localStorage.getItem('viewerId') as string
+      if (result?.value?.battleViewer?.id) {
+        localStorage.setItem('battleId', result.value.battleViewer.id)
+        navigateTo('/battleSubmit')
+      } else { throw new Error('Game startet but this users battle has not been found') }
+    }
   }
 }, { immediate: true })
 

@@ -56,6 +56,7 @@ const gameCode = ref('')
 const { mutate: joinGameMutation } = useGameJoinMutation()
 
 async function joinGame () {
+  console.log('joinGame function called') // Log when the function is called
   try {
     const res = await joinGameMutation({
       input: {
@@ -66,9 +67,12 @@ async function joinGame () {
       }
     })
 
+    console.log('Mutation response:', res) // Log the response from the mutation
+
     if (res?.data?.gameJoin?.user) {
       localStorage.setItem('viewerId', res.data.gameJoin.user.id)
       localStorage.setItem('gameId', res.data.gameJoin.user.game.id)
+      console.log('Stored items in localStorage') // Log when localStorage is updated
       navigateTo('/lobby')
     }
   } catch (error) {

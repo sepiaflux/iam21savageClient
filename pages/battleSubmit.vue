@@ -56,9 +56,13 @@
           </div>
           <button
             type="submit"
-            class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 relative"
+            :disabled="isLoading"
           >
-            Submit Battle
+            <span v-show="!isLoading">Submit Battle</span>
+            <span v-show="isLoading" class="absolute inset-0 flex items-center justify-center">
+              <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
+            </span>
           </button>
         </form>
         <h3 class="mx-auto mt-10 max-w-xl text-lg leading-8 text-gray-300">
@@ -82,6 +86,7 @@ const attribute1 = ref('')
 const attribute2 = ref('')
 const attribute3 = ref('')
 const deviceId = ref('')
+const isLoading = ref(false)
 
 const gameId = localStorage.getItem('gameId') as string
 const { result, loading, error } = useGetGameQuery({ gameId })
@@ -99,6 +104,7 @@ const battleId = localStorage.getItem('battleId') as string
 const { mutate: submitBattleMutation } = useBattleSubmitMutation()
 
 async function submitBattle () {
+  isLoading.value = true
   try {
     const battle = await submitBattleMutation({
       input: {
@@ -116,6 +122,8 @@ async function submitBattle () {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error submitting battle:', error)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>

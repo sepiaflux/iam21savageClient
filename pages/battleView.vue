@@ -55,7 +55,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useGetBattleQuery } from '~~/graphql/generated/graphql'
 
 const battleId = localStorage.getItem('battleId') as string
-const { result, loading, error } = useGetBattleQuery({ id: battleId }, {pollInterval: 20000})
+const { result, loading, error } = useGetBattleQuery({ id: battleId }, {pollInterval: 100000})
 
 const rapTextFirstPlayer = ref('')
 const audioURLFirstPlayer = ref('')

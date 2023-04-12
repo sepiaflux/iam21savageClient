@@ -14,17 +14,18 @@ const retryLink = new RetryLink({
   },
   attempts: {
     max: 20,
-    retryIf: error => !!error
+    retryIf: (error) => !!error
   }
 })
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
   const token = localStorage.getItem('userToken')
+  const viewerId = localStorage.getItem('viewerId')
   return {
     headers: {
       ...headers,
-      authorization: token ? `${token}` : ''
+      authorization: token ? `${token}` : viewerId ? `${viewerId}` : ''
     }
   }
 })

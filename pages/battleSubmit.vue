@@ -28,14 +28,6 @@
                 class="block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md">
             </div>
           </div>
-          <div>
-            <label for="deviceId" class="block text-sm font-medium text-gray-300">Device Id</label>
-            <div class="mt-1">
-              <span class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                {{ deviceId }}
-              </span>
-            </div>
-          </div>
           <button type="submit"
             class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 relative"
             :disabled="isLoading">
@@ -45,6 +37,14 @@
             </span>
           </button>
         </form>
+        <div>
+          <label class="block text-sm font-medium text-gray-300">Device Id</label>
+          <div class="mt-1">
+            <span class="block w-full p-2 shadow-sm sm:text-sm bg-gray-200 text-gray-900 rounded-md">
+              {{ deviceId }}
+            </span>
+          </div>
+        </div>
         <h3 class="mx-auto mt-10 max-w-xl text-lg leading-8 text-gray-300">
           Users in this battle:
         </h3>

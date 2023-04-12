@@ -31,8 +31,9 @@
           <div>
             <label for="deviceId" class="block text-sm font-medium text-gray-300">Device Id</label>
             <div class="mt-1">
-              <input id="deviceId" v-model="deviceId" required type="text"
-                class="block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md">
+              <span class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                {{ deviceId }}
+              </span>
             </div>
           </div>
           <button type="submit"
@@ -58,15 +59,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { User as UserType, useBattleSubmitMutation, useGetBattleViewerQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
 const attribute1 = ref('')
 const attribute2 = ref('')
 const attribute3 = ref('')
 const isLoading = ref(false)
-let deviceId = ''
-
+const deviceId = ref('')
 
 type User = Omit<UserType, 'game'>
 const users = ref<User[]>([])
@@ -80,7 +80,7 @@ const { mutate: submitBattleMutation } = useBattleSubmitMutation()
 
 watch(result, (newValue) => {
   if (newValue && newValue.viewer) {
-    deviceId = newValue.viewer.deviceId || ''
+    deviceId.value = newValue.viewer.deviceId || ''
   }
 }, { immediate: true })
 

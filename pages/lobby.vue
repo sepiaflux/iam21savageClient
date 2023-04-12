@@ -69,10 +69,12 @@ function startGame () {
     { input: { gameId } }
   )
     .then((res) => {
-      if (res?.data?.gameStart?.battles[0].id) {
-        localStorage.setItem('battleId', res?.data?.gameStart?.battles[0].id)
-      }
-      navigateTo('/battleSubmit')
+      res?.data?.gameStart?.battles?.forEach((battle) => {
+        if (battle?.firstPlayer.id === viewerId || battle?.secondPlayer.id === viewerId) {
+          localStorage.setItem('battleId', battle.id)
+          navigateTo('/battleSubmit')
+        }
+      })
     })
     .catch((err) => {
       // eslint-disable-next-line no-console

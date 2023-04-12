@@ -59,13 +59,13 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { User as UserType, useBattleSubmitMutation, useGetBattleViewerQuery } from '~~/graphql/generated/graphql'
+import { User as UserType, useBattleSubmitMutation, useGetBattleViewerQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
 const attribute1 = ref('')
 const attribute2 = ref('')
 const attribute3 = ref('')
-const deviceId = ref('')
 const isLoading = ref(false)
+let deviceId = ''
 
 
 type User = Omit<UserType, 'game'>
@@ -74,8 +74,15 @@ const users = ref<User[]>([])
 const battleId = localStorage.getItem('battleId') as string
 const viewerId = localStorage.getItem('viewerId') as string
 
+const { result, loading, error } = useGetViewerQuery()
 const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })
 const { mutate: submitBattleMutation } = useBattleSubmitMutation()
+
+watch(result, (newValue) => {
+  if (newValue && newValue.viewer) {
+    deviceId = newValue.viewer.deviceId || ''
+  }
+}, { immediate: true })
 
 watch(resultBattleViewerQuery, (newValue) => {
   if (newValue && newValue.battleViewer) {

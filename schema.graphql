@@ -140,6 +140,10 @@ type Query {
   viewer: User
 }
 
+type Subscription {
+  gameUpdated(gameId: ID!): Game
+}
+
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 

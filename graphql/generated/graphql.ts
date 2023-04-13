@@ -201,6 +201,16 @@ export type QueryUserArgs = {
   id: Scalars['ID'];
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  gameUpdated?: Maybe<Game>;
+};
+
+
+export type SubscriptionGameUpdatedArgs = {
+  gameId: Scalars['ID'];
+};
+
 export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
@@ -333,6 +343,13 @@ export type GetViewerQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetViewerQuery = { __typename?: 'Query', viewer?: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string } | null };
+
+export type GameUpdatedSubscriptionVariables = Exact<{
+  gameId: Scalars['ID'];
+}>;
+
+
+export type GameUpdatedSubscription = { __typename?: 'Subscription', gameUpdated?: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } | null };
 
 export const UserInfoFragmentDoc = gql`
     fragment UserInfo on User {
@@ -748,3 +765,30 @@ export function useGetViewerLazyQuery(options: VueApolloComposable.UseQueryOptio
   return VueApolloComposable.useLazyQuery<GetViewerQuery, GetViewerQueryVariables>(GetViewerDocument, {}, options);
 }
 export type GetViewerQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetViewerQuery, GetViewerQueryVariables>;
+export const GameUpdatedDocument = gql`
+    subscription GameUpdated($gameId: ID!) {
+  gameUpdated(gameId: $gameId) {
+    ...GameInfo
+  }
+}
+    ${GameInfoFragmentDoc}`;
+
+/**
+ * __useGameUpdatedSubscription__
+ *
+ * To run a query within a Vue component, call `useGameUpdatedSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useGameUpdatedSubscription` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the subscription
+ * @param options that will be passed into the subscription, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/subscription.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGameUpdatedSubscription({
+ *   gameId: // value for 'gameId'
+ * });
+ */
+export function useGameUpdatedSubscription(variables: GameUpdatedSubscriptionVariables | VueCompositionApi.Ref<GameUpdatedSubscriptionVariables> | ReactiveFunction<GameUpdatedSubscriptionVariables>, options: VueApolloComposable.UseSubscriptionOptions<GameUpdatedSubscription, GameUpdatedSubscriptionVariables> | VueCompositionApi.Ref<VueApolloComposable.UseSubscriptionOptions<GameUpdatedSubscription, GameUpdatedSubscriptionVariables>> | ReactiveFunction<VueApolloComposable.UseSubscriptionOptions<GameUpdatedSubscription, GameUpdatedSubscriptionVariables>> = {}) {
+  return VueApolloComposable.useSubscription<GameUpdatedSubscription, GameUpdatedSubscriptionVariables>(GameUpdatedDocument, variables, options);
+}
+export type GameUpdatedSubscriptionCompositionFunctionResult = VueApolloComposable.UseSubscriptionReturn<GameUpdatedSubscription, GameUpdatedSubscriptionVariables>;

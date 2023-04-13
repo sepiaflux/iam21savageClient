@@ -31,7 +31,10 @@ const authLink = setContext((_, { headers }) => {
 })
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:5000/graphql'
+  uri:   import.meta.env.PROD
+  ? 'https://iam21backend.herokuapp.com/graphql'
+  : 'http://localhost:5000/graphql'
+
 })
 
 export default new ApolloClient({

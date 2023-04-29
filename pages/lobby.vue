@@ -2,7 +2,8 @@
 <template>
   <div class="bg-white">
     <div class="mx-auto max-w-7xl px-3 sm:px-6 py-3 lg:px-8 h-screen">
-      <div class="h-full relative isolate overflow-hidden bg-gray-900 px-6 py-24 text-center shadow-2xl rounded-3xl sm:px-16">
+      <div
+        class="h-full relative isolate overflow-hidden bg-gray-900 px-6 py-24 text-center shadow-2xl rounded-3xl sm:px-16">
         <h2 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Lobby
         </h2>
@@ -17,13 +18,10 @@
             {{ user.name }}
           </li>
         </ul>
-        <button
-          type="button"
-          :disabled="startGameLoading"
+        <button type="button" :disabled="startGameLoading"
           :class="startGameLoading ? 'opacity-50 cursor-not-allowed' : ''"
           class="mt-6 rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          @click="startGame"
-        >
+          @click="startGame">
           START GAME
         </button>
       </div>
@@ -50,7 +48,8 @@ const gameState = ref<GameState | null>(null)
 watch(result, (newValue) => {
   if (newValue && newValue.game) {
     gameCode.value = newValue.game.gameCode || 'GameCode Fehler'
-    users.value = newValue.game.users || []
+    // Filter out users with isHost set to true
+    users.value = newValue.game.users.filter(user => !user.isHost) || []
     gameState.value = newValue.game.state
   }
 }, { immediate: true })
@@ -64,7 +63,7 @@ watch([result, resultBattleViewerQuery], ([gameResult, battleViewerResult]) => {
 
 const { mutate, loading: startGameLoading } = useGameStartMutation()
 
-function startGame () {
+function startGame() {
   mutate(
     { input: { gameId } }
   )

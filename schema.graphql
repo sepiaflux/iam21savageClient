@@ -148,6 +148,7 @@ type User {
   deviceId: String!
   game: Game!
   id: String!
+  isHost: Boolean!
   name: String!
   owner: Boolean!
   score: Int!

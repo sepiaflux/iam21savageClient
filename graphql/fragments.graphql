@@ -5,6 +5,7 @@ fragment UserInfo on User {
   score
   avatar
   deviceId
+  isHost
 }
 
 fragment UserGameInfo on User {

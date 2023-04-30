@@ -67,7 +67,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { GameState, User as UserType, useBattleSubmitMutation, useGetBattleViewerQuery, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+import { GameState, UserInfoFragment, useBattleSubmitMutation, useGetBattleViewerQuery, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
 const attribute1 = ref('')
 const attribute2 = ref('')
@@ -76,8 +76,7 @@ const isLoading = ref(false)
 const deviceId = ref('')
 const isHost = ref(false)
 
-type User = Omit<UserType, 'game'>
-const users = ref<User[]>([])
+const users = ref<UserInfoFragment[]>([])
 
 const battleId = localStorage.getItem('battleId') as string
 const viewerId = localStorage.getItem('viewerId') as string

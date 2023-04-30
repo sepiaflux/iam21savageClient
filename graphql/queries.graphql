@@ -1,11 +1,11 @@
 query GetGame($gameId: ID!) {
   game(gameId: $gameId) {
     ...GameInfo
-    numberOfRounds
-    roundIndex
-    state
     users {
       ...UserInfo
+    }
+    battles {
+      ...BattleInfo
     }
   }
 }

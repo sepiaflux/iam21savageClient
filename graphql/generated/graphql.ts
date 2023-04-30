@@ -302,7 +302,7 @@ export type GetGameQueryVariables = Exact<{
 }>;
 
 
-export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', numberOfRounds: number, roundIndex: number, state: GameState, id: string, gameCode: string, users: Array<{ __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }> } | null };
+export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, users: Array<{ __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }>, battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> } | null };
 
 export type GetUserQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -573,16 +573,17 @@ export const GetGameDocument = gql`
     query GetGame($gameId: ID!) {
   game(gameId: $gameId) {
     ...GameInfo
-    numberOfRounds
-    roundIndex
-    state
     users {
       ...UserInfo
+    }
+    battles {
+      ...BattleInfo
     }
   }
 }
     ${GameInfoFragmentDoc}
-${UserInfoFragmentDoc}`;
+${UserInfoFragmentDoc}
+${BattleInfoFragmentDoc}`;
 
 /**
  * __useGetGameQuery__

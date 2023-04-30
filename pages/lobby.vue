@@ -31,19 +31,31 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { GameState, User as UserType, useGameStartMutation, useGetBattleViewerQuery, useGetGameQuery } from '~~/graphql/generated/graphql'
+import { GameState, User as UserType, useGameStartMutation, useGetBattleViewerQuery, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+
+const deviceId = ref('')
+const isHost = ref(false)
+type User = Omit<UserType, 'game'>
+const users = ref<User[]>([])
+const gameState = ref<GameState | null>(null)
 
 const gameId = localStorage.getItem('gameId') as string
 const { result, loading, error } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
 
 const viewerId = localStorage.getItem('viewerId') as string
 const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
+const { result: resultViewer, loading: loadingViewer, error: errorViewer } = useGetViewerQuery()
 
 const gameCode = ref('Loading...')
 
-type User = Omit<UserType, 'game'>
-const users = ref<User[]>([])
-const gameState = ref<GameState | null>(null)
+
+
+watch(resultViewer, (newValue) => {
+  if (newValue && newValue.viewer) {
+    deviceId.value = newValue.viewer.deviceId || ''
+    isHost.value = newValue.viewer.isHost
+  }
+}, { immediate: true })
 
 watch(result, (newValue) => {
   if (newValue && newValue.game) {
@@ -57,6 +69,8 @@ watch(result, (newValue) => {
 watch([result, resultBattleViewerQuery], ([gameResult, battleViewerResult]) => {
   if (gameResult?.game && gameResult.game.state === GameState.Prompt && battleViewerResult?.battleViewer?.id) {
     localStorage.setItem('battleId', battleViewerResult.battleViewer.id)
+    navigateTo('/battleSubmit')
+  } else if (isHost.value && gameResult?.game?.state === GameState.Prompt) {
     navigateTo('/battleSubmit')
   }
 })

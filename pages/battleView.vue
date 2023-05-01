@@ -55,7 +55,7 @@
               <p v-else class="mt-4 text-lg text-gray-300">
                 No audio available for the second player.
               </p>
-              <hr class="my-10 text-gray-600" v-if="battles && index + 1 < battles.length">
+              <!-- <hr class="my-10 text-gray-600" v-if="battles && index + 1 < battles.length"> -->
             </div>
           </div>
         </div>
@@ -79,7 +79,7 @@ const viewerId = localStorage.getItem('viewerId') as string
 const gameId = localStorage.getItem('gameId') as string
 
 const { result: viewerResult, loading, error } = useGetViewerQuery()
-const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({ pollInterval: battles.value ? undefined : 1000 }))
+const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({ pollInterval: 20000 }))
 
 const battles = computed(() => {
   return gameResult.value?.game?.battles

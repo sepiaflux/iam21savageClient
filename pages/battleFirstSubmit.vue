@@ -101,7 +101,7 @@ watch(resultBattleViewerQuery, (newValue) => {
   }
 }, { immediate: true })
 
-// watch the result of the useGetGameQuery hook and if the state changes to if (isHost && gameResult?.game?.state === GameState.Prompt) { navigateTo('/battleView') }
+// watch the result of the useGetGameQuery hook and if the state changes 
 watch(resultGetGameQuery, (newValue) => {
   if (newValue && newValue.game) {
     if (isHost.value && newValue.game.state === GameState.Voting) {
@@ -124,7 +124,7 @@ async function submitBattle() {
     })
 
     if (battle?.data && battle.data.battleFirstSubmit) {
-      navigateTo('/battleView')
+      navigateTo('/battleSubmit')
     }
   } catch (error) {
     // eslint-disable-next-line no-console

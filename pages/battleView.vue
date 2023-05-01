@@ -78,11 +78,20 @@ const isHost = ref(false)
 const viewerId = localStorage.getItem('viewerId') as string
 const gameId = localStorage.getItem('gameId') as string
 
+const queryPolling = ref(true)
 const { result: viewerResult, loading, error } = useGetViewerQuery()
-const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({ pollInterval: 20000 }))
+const { result: gameResult, loading: gameLoading, error: gameError, } = useGetGameQuery({ gameId }, () => ({
+  pollInterval: queryPolling.value ? 1000 : undefined
+}))
 
 const battles = computed(() => {
   return gameResult.value?.game?.battles
+})
+
+watch(battles, (val) => {
+  if (val) {
+    queryPolling.value = false
+  }
 })
 
 watch(viewerResult, (newValue) => {

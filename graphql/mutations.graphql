@@ -1,3 +1,11 @@
+mutation BattleFirstSubmit($input: battleFirstSubmitInput!) {
+  battleFirstSubmit(input: $input) {
+    battle {
+      ...BattleInfo
+    }
+  }
+}
+
 mutation BattleSubmit($input: battleSubmitInput!) {
   battleSubmit(input: $input) {
     battle {

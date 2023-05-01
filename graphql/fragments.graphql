@@ -33,13 +33,19 @@ fragment GameUsersInfo on Game {
 fragment BattleInfo on Battle {
   id
   attribute1FirstPlayer
-  attribute1SecondPlayer
   attribute2FirstPlayer
-  attribute2SecondPlayer
   attribute3FirstPlayer
-  attribute3SecondPlayer
+  openAIFirstPartFirstPlayer
+  userMiddlePartFirstPlayer
+  rapTextFirstPlayer
   audioURLFirstPlayer
+  attribute1SecondPlayer
+  attribute2SecondPlayer
+  attribute3SecondPlayer
+  openAIFirstPartSecondPlayer
+  userMiddlePartSecondPlayer
   audioURLSecondPlayer
+  rapTextSecondPlayer
   firstPlayer {
     ...UserInfo
   }
@@ -49,8 +55,6 @@ fragment BattleInfo on Battle {
   game {
     ...GameInfo
   }
-  rapTextFirstPlayer
-  rapTextSecondPlayer
   roundIndex
   votesFirstPlayer
   votesSecondPlayer

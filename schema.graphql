@@ -14,10 +14,14 @@ type Battle {
   firstPlayer: User!
   game: Game!
   id: String!
+  openAIFirstPartFirstPlayer: String
+  openAIFirstPartSecondPlayer: String
   rapTextFirstPlayer: String
   rapTextSecondPlayer: String
   roundIndex: Int!
   secondPlayer: User!
+  userMiddlePartFirstPlayer: String
+  userMiddlePartSecondPlayer: String
   votesFirstPlayer: Int!
   votesSecondPlayer: Int!
 }
@@ -31,10 +35,18 @@ input BattleCreateInput {
   attribute3SecondPlayer: String
   firstPlayerId: ID!
   gameId: ID!
+  openAIFirstPartFirstPlayer: String
+  openAIFirstPartSecondPlayer: String
   rapTextFirstPlayer: String
   rapTextSecondPlayer: String
   roundIndex: Int!
   secondPlayerId: ID!
+  userMiddlePartFirstPlayer: String
+  userMiddlePartSecondPlayer: String
+}
+
+type BattleFirstSubmitPayload {
+  battle: Battle!
 }
 
 type BattleSubmitPayload {
@@ -51,9 +63,13 @@ input BattleUpdateInput {
   battle: Int
   firstPlayerId: ID
   gameId: ID
+  openAIFirstPartFirstPlayer: String
+  openAIFirstPartSecondPlayer: String
   rapTextFirstPlayer: String
   rapTextSecondPlayer: String
   secondPlayerId: ID
+  userMiddlePartFirstPlayer: String
+  userMiddlePartSecondPlayer: String
   votesFirstPlayer: Int
 }
 
@@ -110,6 +126,9 @@ enum GameState {
 }
 
 type Mutation {
+  """employee gets created instantly (and if eMail then invited)"""
+  battleFirstSubmit(input: battleFirstSubmitInput!): BattleFirstSubmitPayload
+
   """employee gets created instantly (and if eMail then invited)"""
   battleSubmit(input: battleSubmitInput!): BattleSubmitPayload
 
@@ -168,12 +187,18 @@ input UserUpdateInput {
   score: Int
 }
 
-input battleSubmitInput {
+input battleFirstSubmitInput {
   attribute1: String!
   attribute2: String!
   attribute3: String!
   battleId: ID!
   deviceId: String!
+}
+
+input battleSubmitInput {
+  battleId: ID!
+  deviceId: String!
+  middlePart: String!
 }
 
 input battleVoteInput {

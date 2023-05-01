@@ -14,7 +14,7 @@
             Error loading battle data.
           </div>
           <div v-else class="mt-6">
-            <div v-if="!battles.length" class="text-lg text-gray-300">
+            <div v-if="!battles" class="text-lg text-gray-300">
               No battles have been submitted yet.
             </div>
             <div v-for="(battle, index) in battles" :key="index">
@@ -55,8 +55,7 @@
               <p v-else class="mt-4 text-lg text-gray-300">
                 No audio available for the second player.
               </p>
-              <hr class="my-10 text-gray-600" v-if="index + 1 < battles.length">
-
+              <hr class="my-10 text-gray-600" v-if="battles && index + 1 < battles.length">
             </div>
           </div>
         </div>
@@ -71,17 +70,20 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
-import { BattleInfoFragment, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+import { ref, watch } from 'vue'
+import { useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
 const isHost = ref(false)
-const battles = ref<BattleInfoFragment[]>([])
 
 const viewerId = localStorage.getItem('viewerId') as string
 const gameId = localStorage.getItem('gameId') as string
 
 const { result: viewerResult, loading, error } = useGetViewerQuery()
-const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
+const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({ pollInterval: battles.value ? undefined : 1000 }))
+
+const battles = computed(() => {
+  return gameResult.value?.game?.battles
+})
 
 watch(viewerResult, (newValue) => {
   if (newValue && newValue.viewer) {
@@ -89,17 +91,17 @@ watch(viewerResult, (newValue) => {
   }
 }, { immediate: true })
 
-watch(gameResult, (newValue) => {
-  if (battles.value.length === 0 && !gameLoading.value && !gameError.value && newValue) {
-    battles.value = newValue.game?.battles || []
-  }
-}, { immediate: true })
+// watch(gameResult, (newValue) => {
+//   if (battles.value.length === 0 && !gameLoading.value && !gameError.value && newValue) {
+//     battles.value = newValue.game?.battles || []
+//   }
+// }, { immediate: true })
 
-onMounted(() => {
-  if (!gameLoading.value && !gameError.value && gameResult.value) {
-    battles.value = gameResult.value.game?.battles || []
-  }
-})
+// onMounted(() => {
+//   if (!gameLoading.value && !gameError.value && gameResult.value) {
+//     battles.value = gameResult.value.game?.battles || []
+//   }
+// })
 
 </script>
 

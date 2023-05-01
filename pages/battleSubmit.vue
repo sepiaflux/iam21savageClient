@@ -6,10 +6,19 @@
                 <h2 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
                     Submit Your First Battle Part
                 </h2>
-                <div v-html="openAIFirstPart"></div>
+                <h4 class="text-lg text-gray-300">
+                    First Line:
+                </h4>
+                <p v-if="openAIFirstPart" class="mt-4 text-lg text-gray-300">
+                    {{ openAIFirstPart }}
+                </p>
+                <p v-else class="mt-4 text-lg text-gray-300">
+                    No openai text has been responded. If this is in the worker please wait else there is an error.
+                </p>
                 <form class="mt-6 grid grid-cols-1 gap-y-6" @submit.prevent="submitMiddlePart">
                     <div>
-                        <label for="middlePart" class="block text-sm font-medium text-gray-300">Middle Part</label>
+                        <label for="middlePart" class="block text-sm font-medium text-gray-300">Now continue the rap from
+                            before with 2 lines of your own:</label>
                         <div class="mt-1">
                             <input id="middlePart" v-model="middlePart" required type="text"
                                 class="block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md">

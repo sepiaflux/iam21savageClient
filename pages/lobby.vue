@@ -69,9 +69,9 @@ watch(result, (newValue) => {
 watch([result, resultBattleViewerQuery], ([gameResult, battleViewerResult]) => {
   if (gameResult?.game && gameResult.game.state === GameState.Prompt && battleViewerResult?.battleViewer?.id) {
     localStorage.setItem('battleId', battleViewerResult.battleViewer.id)
-    navigateTo('/battleSubmit')
+    navigateTo('/battleFirstSubmit')
   } else if (isHost.value && gameResult?.game?.state === GameState.Prompt) {
-    navigateTo('/battleSubmit')
+    navigateTo('/battleFirstSubmit')
   }
 })
 
@@ -85,7 +85,7 @@ function startGame() {
       res?.data?.gameStart?.battles?.forEach((battle) => {
         if (battle?.firstPlayer.id === viewerId || battle?.secondPlayer.id === viewerId) {
           localStorage.setItem('battleId', battle.id)
-          navigateTo('/battleSubmit')
+          navigateTo('/battleFirstSubmit')
         }
       })
     })

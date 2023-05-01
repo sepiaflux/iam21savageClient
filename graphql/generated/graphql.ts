@@ -34,10 +34,14 @@ export type Battle = {
   firstPlayer: User;
   game: Game;
   id: Scalars['String'];
+  openAIFirstPartFirstPlayer?: Maybe<Scalars['String']>;
+  openAIFirstPartSecondPlayer?: Maybe<Scalars['String']>;
   rapTextFirstPlayer?: Maybe<Scalars['String']>;
   rapTextSecondPlayer?: Maybe<Scalars['String']>;
   roundIndex: Scalars['Int'];
   secondPlayer: User;
+  userMiddlePartFirstPlayer?: Maybe<Scalars['String']>;
+  userMiddlePartSecondPlayer?: Maybe<Scalars['String']>;
   votesFirstPlayer: Scalars['Int'];
   votesSecondPlayer: Scalars['Int'];
 };
@@ -51,10 +55,19 @@ export type BattleCreateInput = {
   attribute3SecondPlayer?: InputMaybe<Scalars['String']>;
   firstPlayerId: Scalars['ID'];
   gameId: Scalars['ID'];
+  openAIFirstPartFirstPlayer?: InputMaybe<Scalars['String']>;
+  openAIFirstPartSecondPlayer?: InputMaybe<Scalars['String']>;
   rapTextFirstPlayer?: InputMaybe<Scalars['String']>;
   rapTextSecondPlayer?: InputMaybe<Scalars['String']>;
   roundIndex: Scalars['Int'];
   secondPlayerId: Scalars['ID'];
+  userMiddlePartFirstPlayer?: InputMaybe<Scalars['String']>;
+  userMiddlePartSecondPlayer?: InputMaybe<Scalars['String']>;
+};
+
+export type BattleFirstSubmitPayload = {
+  __typename?: 'BattleFirstSubmitPayload';
+  battle: Battle;
 };
 
 export type BattleSubmitPayload = {
@@ -72,9 +85,13 @@ export type BattleUpdateInput = {
   battle?: InputMaybe<Scalars['Int']>;
   firstPlayerId?: InputMaybe<Scalars['ID']>;
   gameId?: InputMaybe<Scalars['ID']>;
+  openAIFirstPartFirstPlayer?: InputMaybe<Scalars['String']>;
+  openAIFirstPartSecondPlayer?: InputMaybe<Scalars['String']>;
   rapTextFirstPlayer?: InputMaybe<Scalars['String']>;
   rapTextSecondPlayer?: InputMaybe<Scalars['String']>;
   secondPlayerId?: InputMaybe<Scalars['ID']>;
+  userMiddlePartFirstPlayer?: InputMaybe<Scalars['String']>;
+  userMiddlePartSecondPlayer?: InputMaybe<Scalars['String']>;
   votesFirstPlayer?: InputMaybe<Scalars['Int']>;
 };
 
@@ -132,6 +149,8 @@ export enum GameState {
 export type Mutation = {
   __typename?: 'Mutation';
   /** employee gets created instantly (and if eMail then invited) */
+  battleFirstSubmit?: Maybe<BattleFirstSubmitPayload>;
+  /** employee gets created instantly (and if eMail then invited) */
   battleSubmit?: Maybe<BattleSubmitPayload>;
   /** employee gets created instantly (and if eMail then invited) */
   battleVote?: Maybe<BattleVotePayload>;
@@ -143,6 +162,11 @@ export type Mutation = {
   gameJoin?: Maybe<GameJoinPayload>;
   /** game gets created instantly (and if eMail then invited) */
   gameStart?: Maybe<GameStartPayload>;
+};
+
+
+export type MutationBattleFirstSubmitArgs = {
+  input: BattleFirstSubmitInput;
 };
 
 
@@ -227,12 +251,18 @@ export type UserUpdateInput = {
   score?: InputMaybe<Scalars['Int']>;
 };
 
-export type BattleSubmitInput = {
+export type BattleFirstSubmitInput = {
   attribute1: Scalars['String'];
   attribute2: Scalars['String'];
   attribute3: Scalars['String'];
   battleId: Scalars['ID'];
   deviceId: Scalars['String'];
+};
+
+export type BattleSubmitInput = {
+  battleId: Scalars['ID'];
+  deviceId: Scalars['String'];
+  middlePart: Scalars['String'];
 };
 
 export type BattleVoteInput = {
@@ -258,23 +288,30 @@ export type GameInfoFragment = { __typename?: 'Game', id: string, gameCode: stri
 
 export type GameUsersInfoFragment = { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, users: Array<{ __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }> };
 
-export type BattleInfoFragment = { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } };
+export type BattleInfoFragment = { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } };
 
-export type GameBattlesInfoFragment = { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> };
+export type GameBattlesInfoFragment = { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> };
+
+export type BattleFirstSubmitMutationVariables = Exact<{
+  input: BattleFirstSubmitInput;
+}>;
+
+
+export type BattleFirstSubmitMutation = { __typename?: 'Mutation', battleFirstSubmit?: { __typename?: 'BattleFirstSubmitPayload', battle: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
 
 export type BattleSubmitMutationVariables = Exact<{
   input: BattleSubmitInput;
 }>;
 
 
-export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
+export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
 
 export type BattleVoteMutationVariables = Exact<{
   input: BattleVoteInput;
 }>;
 
 
-export type BattleVoteMutation = { __typename?: 'Mutation', battleVote?: { __typename?: 'BattleVotePayload', battle: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
+export type BattleVoteMutation = { __typename?: 'Mutation', battleVote?: { __typename?: 'BattleVotePayload', battle: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
 
 export type GameCreateMutationVariables = Exact<{
   input: GameCreateInput;
@@ -295,14 +332,14 @@ export type GameStartMutationVariables = Exact<{
 }>;
 
 
-export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> } | null };
+export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> } | null };
 
 export type GetGameQueryVariables = Exact<{
   gameId: Scalars['ID'];
 }>;
 
 
-export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, users: Array<{ __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }>, battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> } | null };
+export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, users: Array<{ __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }>, battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> } | null };
 
 export type GetUserQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -316,19 +353,19 @@ export type GetBattleQueryVariables = Exact<{
 }>;
 
 
-export type GetBattleQuery = { __typename?: 'Query', battle?: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } | null };
+export type GetBattleQuery = { __typename?: 'Query', battle?: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } | null };
 
 export type GetBattlesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBattlesQuery = { __typename?: 'Query', battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> };
+export type GetBattlesQuery = { __typename?: 'Query', battles: Array<{ __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> };
 
 export type GetBattleViewerQueryVariables = Exact<{
   userId: Scalars['ID'];
 }>;
 
 
-export type GetBattleViewerQuery = { __typename?: 'Query', battleViewer?: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3FirstPlayer?: string | null, attribute3SecondPlayer?: string | null, audioURLFirstPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextFirstPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } | null };
+export type GetBattleViewerQuery = { __typename?: 'Query', battleViewer?: { __typename?: 'Battle', id: string, attribute1FirstPlayer?: string | null, attribute2FirstPlayer?: string | null, attribute3FirstPlayer?: string | null, openAIFirstPartFirstPlayer?: string | null, userMiddlePartFirstPlayer?: string | null, rapTextFirstPlayer?: string | null, audioURLFirstPlayer?: string | null, attribute1SecondPlayer?: string | null, attribute2SecondPlayer?: string | null, attribute3SecondPlayer?: string | null, openAIFirstPartSecondPlayer?: string | null, userMiddlePartSecondPlayer?: string | null, audioURLSecondPlayer?: string | null, rapTextSecondPlayer?: string | null, roundIndex: number, votesFirstPlayer: number, votesSecondPlayer: number, firstPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, secondPlayer: { __typename?: 'User', id: string, name: string, owner: boolean, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } | null };
 
 export type GetViewerQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -377,13 +414,19 @@ export const BattleInfoFragmentDoc = gql`
     fragment BattleInfo on Battle {
   id
   attribute1FirstPlayer
-  attribute1SecondPlayer
   attribute2FirstPlayer
-  attribute2SecondPlayer
   attribute3FirstPlayer
-  attribute3SecondPlayer
+  openAIFirstPartFirstPlayer
+  userMiddlePartFirstPlayer
+  rapTextFirstPlayer
   audioURLFirstPlayer
+  attribute1SecondPlayer
+  attribute2SecondPlayer
+  attribute3SecondPlayer
+  openAIFirstPartSecondPlayer
+  userMiddlePartSecondPlayer
   audioURLSecondPlayer
+  rapTextSecondPlayer
   firstPlayer {
     ...UserInfo
   }
@@ -393,8 +436,6 @@ export const BattleInfoFragmentDoc = gql`
   game {
     ...GameInfo
   }
-  rapTextFirstPlayer
-  rapTextSecondPlayer
   roundIndex
   votesFirstPlayer
   votesSecondPlayer
@@ -410,6 +451,37 @@ export const GameBattlesInfoFragmentDoc = gql`
 }
     ${GameInfoFragmentDoc}
 ${BattleInfoFragmentDoc}`;
+export const BattleFirstSubmitDocument = gql`
+    mutation BattleFirstSubmit($input: battleFirstSubmitInput!) {
+  battleFirstSubmit(input: $input) {
+    battle {
+      ...BattleInfo
+    }
+  }
+}
+    ${BattleInfoFragmentDoc}`;
+
+/**
+ * __useBattleFirstSubmitMutation__
+ *
+ * To run a mutation, you first call `useBattleFirstSubmitMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useBattleFirstSubmitMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useBattleFirstSubmitMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBattleFirstSubmitMutation(options: VueApolloComposable.UseMutationOptions<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables>(BattleFirstSubmitDocument, options);
+}
+export type BattleFirstSubmitMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables>;
 export const BattleSubmitDocument = gql`
     mutation BattleSubmit($input: battleSubmitInput!) {
   battleSubmit(input: $input) {

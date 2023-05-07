@@ -59,9 +59,11 @@ const { result, loading, error } = useGetViewerQuery()
 const { mutate: submitFirstBattleMutation } = useBattleSubmitMutation()
 
 const openAIFirstPart = computed(() => {
+  // eslint-disable-next-line no-console
+  console.log('battleParticipants', resultBattleViewerQuery.value?.battleViewer?.battleParticipants)
   const { battleParticipants } = resultBattleViewerQuery.value?.battleViewer || {}
   if (battleParticipants) {
-    const battleParticipant = battleParticipants.find(bp => bp.id === viewerId)
+    const battleParticipant = battleParticipants.find(bp => bp.participant.id === viewerId)
     if (battleParticipant) {
       return battleParticipant.openAIFirstPart
     }

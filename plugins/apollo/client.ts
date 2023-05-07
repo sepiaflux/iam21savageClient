@@ -14,7 +14,7 @@ const retryLink = new RetryLink({
   },
   attempts: {
     max: 20,
-    retryIf: (error) => !!error
+    retryIf: error => !!error
   }
 })
 
@@ -31,9 +31,9 @@ const authLink = setContext((_, { headers }) => {
 })
 
 const httpLink = new HttpLink({
-  uri:   import.meta.env.PROD
-  ? 'https://iam21backend.herokuapp.com/graphql'
-  : 'http://localhost:5000/graphql'
+  uri: import.meta.env.PROD
+    ? 'https://iam21backend.herokuapp.com/graphql'
+    : 'http://localhost:5000/graphql'
 
 })
 

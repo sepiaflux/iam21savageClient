@@ -1,23 +1,23 @@
-mutation BattleFirstSubmit($input: battleFirstSubmitInput!) {
+mutation BattleFirstSubmit($input: BattleFirstSubmitInput!) {
   battleFirstSubmit(input: $input) {
-    battle {
-      ...BattleInfo
+    battleParticipant {
+      ...BattleParticipant
     }
   }
 }
 
-mutation BattleSubmit($input: battleSubmitInput!) {
+mutation BattleSubmit($input: BattleSubmitInput!) {
   battleSubmit(input: $input) {
     battle {
-      ...BattleInfo
+      ...Battle
     }
   }
 }
 
-mutation BattleVote($input: battleVoteInput!) {
-  battleVote(input: $input) {
-    battle {
-      ...BattleInfo
+mutation Vote($input: VoteInput!) {
+  vote(input: $input) {
+    battleParticipant {
+      ...BattleParticipant
     }
   }
 }
@@ -25,26 +25,26 @@ mutation BattleVote($input: battleVoteInput!) {
 mutation GameCreate($input: GameCreateInput!) {
   gameCreate(input: $input) {
     user {
-      ...UserGameInfo
+      ...FullUser
     }
   }
 }
 
-mutation GameJoin($input: gameJoinInput!) {
+mutation GameJoin($input: GameJoinInput!) {
   gameJoin(input: $input) {
     user {
-      ...UserGameInfo
+      ...FullUser
     }
   }
 }
 
-mutation GameStart($input: gameStartInput!) {
+mutation GameStart($input: GameStartInput!) {
   gameStart(input: $input) {
     game {
-      ...GameInfo
+      ...Game
     }
     battles {
-      ...BattleInfo
+      ...Battle
     }
   }
 }

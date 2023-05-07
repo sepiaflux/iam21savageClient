@@ -1,41 +1,41 @@
 query GetGame($gameId: ID!) {
   game(gameId: $gameId) {
-    ...GameInfo
+    ...Game
     users {
-      ...UserInfo
+      ...User
     }
     battles {
-      ...BattleInfo
+      ...Battle
     }
   }
 }
 
 query GetUser($id: ID!) {
   user(id: $id) {
-    ...UserInfo
+    ...User
   }
 }
 
 query GetBattle($id: ID!) {
   battle(id: $id) {
-    ...BattleInfo
+    ...Battle
   }
 }
 
 query GetBattles {
   battles {
-    ...BattleInfo
+    ...Battle
   }
 }
 
 query GetBattleViewer($userId: ID!) {
   battleViewer(userId: $userId) {
-    ...BattleInfo
+    ...Battle
   }
 }
 
 query GetViewer {
   viewer {
-    ...UserInfo
+    ...User
   }
 }

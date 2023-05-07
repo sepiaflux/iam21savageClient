@@ -1,52 +1,70 @@
 type Battle {
-  attribute1FirstPlayer: String
-  attribute1SecondPlayer: String
-  attribute2FirstPlayer: String
-  attribute2SecondPlayer: String
-  attribute3FirstPlayer: String
-  attribute3SecondPlayer: String
-
-  """we use a service for this so this is the link to that service"""
-  audioURLFirstPlayer: String
-
-  """we use a service for this so this is the link to that service"""
-  audioURLSecondPlayer: String
-  firstPlayer: User!
+  battleParticipants: [BattleParticipant!]!
   game: Game!
   id: String!
-  openAIFirstPartFirstPlayer: String
-  openAIFirstPartSecondPlayer: String
-  rapTextFirstPlayer: String
-  rapTextSecondPlayer: String
   roundIndex: Int!
-  secondPlayer: User!
-  userMiddlePartFirstPlayer: String
-  userMiddlePartSecondPlayer: String
-  votesFirstPlayer: Int!
-  votesSecondPlayer: Int!
 }
 
 input BattleCreateInput {
-  attribute1FirstPlayer: String
-  attribute1SecondPlayer: String
-  attribute2FirstPlayer: String
-  attribute2SecondPlayer: String
-  attribute3FirstPlayer: String
-  attribute3SecondPlayer: String
-  firstPlayerId: ID!
+  battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
   gameId: ID!
-  openAIFirstPartFirstPlayer: String
-  openAIFirstPartSecondPlayer: String
-  rapTextFirstPlayer: String
-  rapTextSecondPlayer: String
   roundIndex: Int!
-  secondPlayerId: ID!
-  userMiddlePartFirstPlayer: String
-  userMiddlePartSecondPlayer: String
+}
+
+input BattleFirstSubmitInput {
+  attribute1: String!
+  attribute2: String!
+  attribute3: String!
+  battleId: ID!
+  deviceId: String!
 }
 
 type BattleFirstSubmitPayload {
+  battleParticipant: BattleParticipant!
+}
+
+type BattleParticipant {
+  attribute1: String
+  attribute2: String
+  attribute3: String
+
+  """we use a service for this so this is the link to that service"""
+  audioURL: String
   battle: Battle!
+  id: String!
+  openAIFirstPart: String
+  participant: User!
+  rapText: String
+  userMiddlePart: String
+  votes: [Vote!]!
+}
+
+input BattleParticipantCreateInput {
+  attribute1: String
+  attribute2: String
+  attribute3: String
+  battleId: ID!
+  openAIFirstPart: String
+  participantId: ID!
+  rapText: String
+  userMiddlePart: String
+}
+
+input BattleParticipantUpdateInput {
+  attribute1: String
+  attribute2: String
+  attribute3: String
+  battleId: ID
+  openAIFirstPart: String
+  participantId: ID
+  rapText: String
+  userMiddlePart: String
+}
+
+input BattleSubmitInput {
+  battleId: ID!
+  deviceId: String!
+  middlePart: String!
 }
 
 type BattleSubmitPayload {
@@ -54,27 +72,9 @@ type BattleSubmitPayload {
 }
 
 input BattleUpdateInput {
-  attribute1FirstPlayer: String
-  attribute1SecondPlayer: String
-  attribute2FirstPlayer: String
-  attribute2SecondPlayer: String
-  attribute3FirstPlayer: String
-  attribute3SecondPlayer: String
-  battle: Int
-  firstPlayerId: ID
-  gameId: ID
-  openAIFirstPartFirstPlayer: String
-  openAIFirstPartSecondPlayer: String
-  rapTextFirstPlayer: String
-  rapTextSecondPlayer: String
-  secondPlayerId: ID
-  userMiddlePartFirstPlayer: String
-  userMiddlePartSecondPlayer: String
-  votesFirstPlayer: Int
-}
-
-type BattleVotePayload {
-  battle: Battle!
+  battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
+  gameId: ID!
+  roundIndex: Int!
 }
 
 type ConnectToCloudFuncPayload {
@@ -100,15 +100,23 @@ type Game {
 
 input GameCreateInput {
   numberOfRounds: Int
-  ownerUser: UserCreateInput!
 }
 
 type GameCreatePayload {
   user: User!
 }
 
+input GameJoinInput {
+  gameCode: ID!
+  user: UserCreateInput!
+}
+
 type GameJoinPayload {
   user: User!
+}
+
+input GameStartInput {
+  gameId: ID!
 }
 
 type GameStartPayload {
@@ -127,13 +135,8 @@ enum GameState {
 
 type Mutation {
   """employee gets created instantly (and if eMail then invited)"""
-  battleFirstSubmit(input: battleFirstSubmitInput!): BattleFirstSubmitPayload
-
-  """employee gets created instantly (and if eMail then invited)"""
-  battleSubmit(input: battleSubmitInput!): BattleSubmitPayload
-
-  """employee gets created instantly (and if eMail then invited)"""
-  battleVote(input: battleVoteInput!): BattleVotePayload
+  battleFirstSubmit(input: BattleFirstSubmitInput!): BattleFirstSubmitPayload
+  battleSubmit(input: BattleSubmitInput!): BattleSubmitPayload
 
   """game gets created instantly (and if eMail then invited)"""
   connectToCloudFunc: ConnectToCloudFuncPayload
@@ -142,10 +145,13 @@ type Mutation {
   gameCreate(input: GameCreateInput!): GameCreatePayload
 
   """game gets created instantly (and if eMail then invited)"""
-  gameJoin(input: gameJoinInput!): GameJoinPayload
+  gameJoin(input: GameJoinInput!): GameJoinPayload
 
   """game gets created instantly (and if eMail then invited)"""
-  gameStart(input: gameStartInput!): GameStartPayload
+  gameStart(input: GameStartInput!): GameStartPayload
+
+  """employee gets created instantly (and if eMail then invited)"""
+  vote(input: VoteInput!): VotePayload
 }
 
 type Query {
@@ -164,12 +170,12 @@ scalar Upload
 
 type User {
   avatar: String
+  battlesWhereParticipant: [BattleParticipant!]!
   deviceId: String!
   game: Game!
   id: String!
   isHost: Boolean!
   name: String!
-  owner: Boolean!
   score: Int!
 }
 
@@ -187,31 +193,31 @@ input UserUpdateInput {
   score: Int
 }
 
-input battleFirstSubmitInput {
-  attribute1: String!
-  attribute2: String!
-  attribute3: String!
-  battleId: ID!
-  deviceId: String!
+type Vote {
+  battleParticipant: BattleParticipant!
+  id: String!
+  votee: User!
+  voter: User!
 }
 
-input battleSubmitInput {
-  battleId: ID!
-  deviceId: String!
-  middlePart: String!
-}
-
-input battleVoteInput {
+input VoteCreateInput {
   battleId: ID!
   voteeId: ID!
   voterId: ID!
 }
 
-input gameJoinInput {
-  gameCode: ID!
-  user: UserCreateInput!
+input VoteInput {
+  battleParticipantId: ID!
+  voteeId: ID!
+  voterId: ID!
 }
 
-input gameStartInput {
-  gameId: ID!
+type VotePayload {
+  battleParticipant: BattleParticipant!
+}
+
+input VoteUpdateInput {
+  battleId: ID
+  voteeId: ID
+  voterId: ID
 }

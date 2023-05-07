@@ -1,21 +1,20 @@
-fragment UserInfo on User {
+fragment User on User {
   id
   name
-  owner
   score
   avatar
   deviceId
   isHost
 }
 
-fragment UserGameInfo on User {
-  ...UserInfo
+fragment FullUser on User {
+  ...User
   game {
-    ...GameInfo
+    ...Game
   }
 }
 
-fragment GameInfo on Game {
+fragment Game on Game {
   id
   gameCode
   numberOfRounds
@@ -23,46 +22,40 @@ fragment GameInfo on Game {
   state
 }
 
-fragment GameUsersInfo on Game {
-  ...GameInfo
-  users {
-    ...UserInfo
+fragment vote on Vote {
+  id
+  votee {
+    ...User
+  }
+  voter {
+    ...User
   }
 }
 
-fragment BattleInfo on Battle {
+fragment BattleParticipant on BattleParticipant {
   id
-  attribute1FirstPlayer
-  attribute2FirstPlayer
-  attribute3FirstPlayer
-  openAIFirstPartFirstPlayer
-  userMiddlePartFirstPlayer
-  rapTextFirstPlayer
-  audioURLFirstPlayer
-  attribute1SecondPlayer
-  attribute2SecondPlayer
-  attribute3SecondPlayer
-  openAIFirstPartSecondPlayer
-  userMiddlePartSecondPlayer
-  audioURLSecondPlayer
-  rapTextSecondPlayer
-  firstPlayer {
-    ...UserInfo
+  attribute1
+  attribute2
+  attribute3
+  openAIFirstPart
+  userMiddlePart
+  rapText
+  audioURL
+  participant {
+    ...User
   }
-  secondPlayer {
-    ...UserInfo
+  votes {
+    ...vote
   }
+}
+
+fragment Battle on Battle {
+  id
   game {
-    ...GameInfo
+    ...Game
+  }
+  battleParticipants {
+    ...BattleParticipant
   }
   roundIndex
-  votesFirstPlayer
-  votesSecondPlayer
-}
-
-fragment GameBattlesInfo on Game {
-  ...GameInfo
-  battles {
-    ...BattleInfo
-  }
 }

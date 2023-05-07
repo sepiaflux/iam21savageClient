@@ -2,7 +2,8 @@
   <div class="bg-white">
     <div class="mx-auto max-w-7xl px-3 sm:px-6 py-3 lg:px-8 h-screen">
       <div
-        class="h-full relative isolate overflow-hidden bg-gray-900 px-6 py-24 text-center shadow-2xl rounded-3xl sm:px-16">
+        class="h-full relative isolate overflow-hidden bg-gray-900 px-6 py-24 text-center shadow-2xl rounded-3xl sm:px-16"
+      >
         <h2 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Battle View
         </h2>
@@ -33,8 +34,13 @@
               <h4 class="mt-10 text-lg text-gray-300">
                 Audio - First Player:
               </h4>
-              <audio v-if="battle.audioURLFirstPlayer" :key="battle.audioURLFirstPlayer" class="mt-4" controls
-                :src="battle.audioURLFirstPlayer">Your browser does not support the audio element.</audio>
+              <audio
+                v-if="battle.audioURLFirstPlayer"
+                :key="battle.audioURLFirstPlayer"
+                class="mt-4"
+                controls
+                :src="battle.audioURLFirstPlayer"
+              >Your browser does not support the audio element.</audio>
               <p v-else class="mt-4 text-lg text-gray-300">
                 No audio available for the first player.
               </p>
@@ -50,8 +56,13 @@
               <h4 class="mt-10 text-lg text-gray-300">
                 Audio - Second Player:
               </h4>
-              <audio v-if="battle.audioURLSecondPlayer" :key="battle.audioURLSecondPlayer" class="mt-4" controls
-                :src="battle.audioURLSecondPlayer">Your browser does not support the audio element.</audio>
+              <audio
+                v-if="battle.audioURLSecondPlayer"
+                :key="battle.audioURLSecondPlayer"
+                class="mt-4"
+                controls
+                :src="battle.audioURLSecondPlayer"
+              >Your browser does not support the audio element.</audio>
               <p v-else class="mt-4 text-lg text-gray-300">
                 No audio available for the second player.
               </p>
@@ -80,7 +91,7 @@ const gameId = localStorage.getItem('gameId') as string
 
 const queryPolling = ref(true)
 const { result: viewerResult, loading, error } = useGetViewerQuery()
-const { result: gameResult, loading: gameLoading, error: gameError, } = useGetGameQuery({ gameId }, () => ({
+const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({
   pollInterval: queryPolling.value ? 1000 : undefined
 }))
 
@@ -113,4 +124,3 @@ watch(viewerResult, (newValue) => {
 // })
 
 </script>
-

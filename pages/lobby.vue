@@ -35,12 +35,11 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { GameState, User as UserType, useGameStartMutation, useGetBattleViewerQuery, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+import { GameState, UserFragment, useGameStartMutation, useGetBattleViewerQuery, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
 const deviceId = ref('')
 const isHost = ref(false)
-type User = Omit<UserType, 'game'>
-const users = ref<User[]>([])
+const users = ref<UserFragment[]>([])
 const gameState = ref<GameState | null>(null)
 
 const gameId = localStorage.getItem('gameId') as string
@@ -85,10 +84,12 @@ function startGame () {
   )
     .then((res) => {
       res?.data?.gameStart?.battles?.forEach((battle) => {
-        if (battle?.firstPlayer.id === viewerId || battle?.secondPlayer.id === viewerId) {
-          localStorage.setItem('battleId', battle.id)
-          navigateTo('/battleFirstSubmit')
-        }
+        battle.battleParticipants.forEach((battleParticipant) => {
+          if (battleParticipant.participant.id === viewerId) {
+            localStorage.setItem('battleId', battle.id)
+            navigateTo('/battleFirstSubmit')
+          }
+        })
       })
     })
     .catch((err) => {

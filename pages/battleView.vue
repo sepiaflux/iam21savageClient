@@ -78,8 +78,30 @@ const battles = computed(() => {
 })
 
 watch(battles, (val) => {
-  if (val) {
-    queryPolling.value = false
+  // Check if there are any battles
+  if (val && val.length > 0) {
+    let allHaveAudioURL = true
+
+    // Iterate through the battles
+    for (const battle of val) {
+      // Check if all battleParticipants have an audioURL
+      for (const participant of battle.battleParticipants) {
+        if (!participant.audioURL) {
+          allHaveAudioURL = false
+          break
+        }
+      }
+
+      // If any battleParticipant doesn't have an audioURL, stop checking further
+      if (!allHaveAudioURL) {
+        break
+      }
+    }
+
+    // If all battleParticipants of all battles have an audioURL, stop polling
+    if (allHaveAudioURL) {
+      queryPolling.value = false
+    }
   }
 })
 

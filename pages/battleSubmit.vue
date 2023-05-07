@@ -42,15 +42,10 @@
     </div>
   </div>
 </template>
-
 <script lang="ts" setup>
 import { UserFragment, useBattleSubmitMutation, useGetBattleViewerQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
-// Add imports and logic specific to battleFirstSubmit.vue
-
 const middlePart = ref('')
-const isFirstPlayer = ref(false)
-
 const deviceId = ref('')
 const isLoading = ref(false)
 
@@ -59,23 +54,19 @@ const viewerId = localStorage.getItem('viewerId') as string
 const gameId = localStorage.getItem('gameId') as string
 const users = ref<UserFragment[]>([])
 
-// Add logic for setting isFirstPlayer based on viewer.deviceId matching the deviceId of the firstPlayer of the battle
-// Add logic for setting openAIFirstPartFirstPlayer and openAIFirstPartSecondPlayer
 const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
 const { result, loading, error } = useGetViewerQuery()
 const { mutate: submitFirstBattleMutation } = useBattleSubmitMutation()
 
 const openAIFirstPart = computed(() => {
-  const battleViewer = resultBattleViewerQuery.value?.battleViewer
   const { battleParticipants } = resultBattleViewerQuery.value?.battleViewer || {}
   if (battleParticipants) {
-    for (const battleParticipant of battleParticipants) {
-      if (battleParticipant.id === viewerId) { return battleParticipant.openAIFirstPart }
-      return battleViewer?.openAIFirstPart
+    const battleParticipant = battleParticipants.find(bp => bp.id === viewerId)
+    if (battleParticipant) {
+      return battleParticipant.openAIFirstPart
     }
   }
 })
-
 watch(result, (newValue) => {
   if (newValue && newValue.viewer) {
     deviceId.value = newValue.viewer.deviceId || ''
@@ -98,7 +89,6 @@ async function submitMiddlePart () {
         deviceId: deviceId.value
       }
     })
-
     if (battle?.data && battle.data.battleSubmit) {
       navigateTo('/battleView')
     }

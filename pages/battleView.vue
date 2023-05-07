@@ -25,48 +25,27 @@
               <h4 class="text-lg text-gray-300">
                 Rap Text - First Player:
               </h4>
-              <p v-if="battle.rapTextFirstPlayer" class="mt-4 text-lg text-gray-300">
-                {{ battle.rapTextFirstPlayer }}
-              </p>
-              <p v-else class="mt-4 text-lg text-gray-300">
-                No rap text available for the first player.
-              </p>
-              <h4 class="mt-10 text-lg text-gray-300">
-                Audio - First Player:
-              </h4>
-              <audio
-                v-if="battle.audioURLFirstPlayer"
-                :key="battle.audioURLFirstPlayer"
-                class="mt-4"
-                controls
-                :src="battle.audioURLFirstPlayer"
-              >Your browser does not support the audio element.</audio>
-              <p v-else class="mt-4 text-lg text-gray-300">
-                No audio available for the first player.
-              </p>
-              <h4 class="mt-10 text-lg text-gray-300">
-                Rap Text - Second Player:
-              </h4>
-              <p v-if="battle.rapTextSecondPlayer" class="mt-4 text-lg text-gray-300">
-                {{ battle.rapTextSecondPlayer }}
-              </p>
-              <p v-else class="mt-4 text-lg text-gray-300">
-                No rap text available for the second player.
-              </p>
-              <h4 class="mt-10 text-lg text-gray-300">
-                Audio - Second Player:
-              </h4>
-              <audio
-                v-if="battle.audioURLSecondPlayer"
-                :key="battle.audioURLSecondPlayer"
-                class="mt-4"
-                controls
-                :src="battle.audioURLSecondPlayer"
-              >Your browser does not support the audio element.</audio>
-              <p v-else class="mt-4 text-lg text-gray-300">
-                No audio available for the second player.
-              </p>
-              <!-- <hr class="my-10 text-gray-600" v-if="battles && index + 1 < battles.length"> -->
+              <div v-for="(battleParticipant, battleParticipantIndex) in battle.battleParticipants" :key="battleParticipantIndex">
+                <p v-if="battleParticipant.rapText" class="mt-4 text-lg text-gray-300">
+                  {{ battleParticipant.rapText }}
+                </p>
+                <p v-else class="mt-4 text-lg text-gray-300">
+                  No rap text available for player {{ battleParticipantIndex }}.
+                </p>
+                <h4 class="mt-10 text-lg text-gray-300">
+                  Audio - Player {{ battleParticipantIndex }}:
+                </h4>
+                <audio
+                  v-if="battleParticipant.audioURL"
+                  :key="battleParticipant.audioURL"
+                  class="mt-4"
+                  controls
+                  :src="battleParticipant.audioURL"
+                >Your browser does not support the audio element.</audio>
+                <p v-else class="mt-4 text-lg text-gray-300">
+                  No audio available for player {{ battleParticipantIndex }}.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -86,7 +65,6 @@ import { useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql
 
 const isHost = ref(false)
 
-const viewerId = localStorage.getItem('viewerId') as string
 const gameId = localStorage.getItem('gameId') as string
 
 const queryPolling = ref(true)
@@ -110,17 +88,5 @@ watch(viewerResult, (newValue) => {
     isHost.value = newValue.viewer.isHost
   }
 }, { immediate: true })
-
-// watch(gameResult, (newValue) => {
-//   if (battles.value.length === 0 && !gameLoading.value && !gameError.value && newValue) {
-//     battles.value = newValue.game?.battles || []
-//   }
-// }, { immediate: true })
-
-// onMounted(() => {
-//   if (!gameLoading.value && !gameError.value && gameResult.value) {
-//     battles.value = gameResult.value.game?.battles || []
-//   }
-// })
 
 </script>

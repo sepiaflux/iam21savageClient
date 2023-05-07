@@ -61,10 +61,7 @@ const nameInput = ref('')
 function createRoom () {
   mutate({
     input: {
-      numberOfRounds: 1,
-      ownerUser: {
-        name: nameInput.value
-      }
+      numberOfRounds: 1
     }
   })
     .then((res) => {

@@ -104,7 +104,6 @@ const { result, loading, error } = useGetViewerQuery()
 const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })
 const { mutate: submitFirstBattleMutation } = useBattleFirstSubmitMutation()
 // use the useGetGameQuery hook to get the game data
-const { result: resultGetGameQuery, loading: loadingGetGameQuery, error: errorGetGameQuery } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
 
 watch(result, (newValue) => {
   if (newValue && newValue.viewer) {
@@ -118,6 +117,8 @@ watch(resultBattleViewerQuery, (newValue) => {
     users.value = newValue.battleViewer.battleParticipants.map(participant => participant.participant)
   }
 }, { immediate: true })
+
+const { result: resultGetGameQuery, loading: loadingGetGameQuery, error: errorGetGameQuery } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
 
 // watch the result of the useGetGameQuery hook and if the state changes
 watch(resultGetGameQuery, (newValue) => {

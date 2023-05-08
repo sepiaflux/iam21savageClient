@@ -21,9 +21,6 @@
             <h3 class="text-lg text-gray-300">
               Battle {{ index + 1 }}
             </h3>
-            <h4 class="text-lg text-gray-300">
-              Rap Text - First Player:
-            </h4>
             <div v-for="(battleParticipant, battleParticipantIndex) in battle.battleParticipants" :key="battleParticipantIndex">
               <template v-if="isHost">
                 <h4 class="text-lg text-gray-300">
@@ -64,7 +61,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { useGetGameQuery, useGetViewerQuery, useVoteMutation } from '~~/graphql/generated/graphql'
+import { GameState, useGetGameQuery, useGetViewerQuery, useVoteMutation } from '~~/graphql/generated/graphql'
 
 const isHost = ref(false)
 
@@ -73,7 +70,7 @@ const gameId = localStorage.getItem('gameId') as string
 const queryPolling = ref(true)
 const { result: viewerResult, loading, error } = useGetViewerQuery()
 const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({
-  pollInterval: queryPolling.value ? 1000 : undefined
+  pollInterval: queryPolling.value ? 1000 : 1000
 }))
 
 const battles = computed(() => {
@@ -137,5 +134,14 @@ async function vote (battleParticipantId: string) {
     console.error('Error submitting vote:', error)
   }
 }
+
+// watch the result of the useGetGameQuery hook and if the state changes
+watch(gameResult, (newValue) => {
+  if (newValue && newValue.game) {
+    if (newValue.game.state === GameState.Results) {
+      navigateTo('/viewScore')
+    }
+  }
+})
 
 </script>

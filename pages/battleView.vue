@@ -7,25 +7,28 @@
         <h2 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Battle View
         </h2>
-        <div v-if="isHost">
-          <div v-if="loading" class="mt-6 text-lg text-gray-300">
-            Loading...
+        <div v-if="loading" class="mt-6 text-lg text-gray-300">
+          Loading...
+        </div>
+        <div v-else-if="error" class="mt-6 text-lg text-red-500">
+          Error loading battle data.
+        </div>
+        <div v-else class="mt-6">
+          <div v-if="!battles" class="text-lg text-gray-300">
+            No battles have been submitted yet.
           </div>
-          <div v-else-if="error" class="mt-6 text-lg text-red-500">
-            Error loading battle data.
-          </div>
-          <div v-else class="mt-6">
-            <div v-if="!battles" class="text-lg text-gray-300">
-              No battles have been submitted yet.
-            </div>
-            <div v-for="(battle, index) in battles" :key="index">
-              <h3 class="text-lg text-gray-300">
-                Battle {{ index + 1 }}
-              </h3>
-              <h4 class="text-lg text-gray-300">
-                Rap Text - First Player:
-              </h4>
-              <div v-for="(battleParticipant, battleParticipantIndex) in battle.battleParticipants" :key="battleParticipantIndex">
+          <div v-for="(battle, index) in battles" :key="index">
+            <h3 class="text-lg text-gray-300">
+              Battle {{ index + 1 }}
+            </h3>
+            <h4 class="text-lg text-gray-300">
+              Rap Text - First Player:
+            </h4>
+            <div v-for="(battleParticipant, battleParticipantIndex) in battle.battleParticipants" :key="battleParticipantIndex">
+              <template v-if="isHost">
+                <h4 class="text-lg text-gray-300">
+                  Rap Text - First Player:
+                </h4>
                 <p v-if="battleParticipant.rapText" class="mt-4 text-lg text-gray-300">
                   {{ battleParticipant.rapText }}
                 </p>
@@ -45,14 +48,14 @@
                 <p v-else class="mt-4 text-lg text-gray-300">
                   No audio available for player {{ battleParticipantIndex }}.
                 </p>
-              </div>
+              </template>
+              <template v-else>
+                <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="vote(battleParticipant.id)">
+                  Vote for {{ battleParticipant.participant.name }}
+                </button>
+              </template>
             </div>
           </div>
-        </div>
-        <div v-else>
-          <h3 class="mx-auto mt-10 max-w-xl text-lg leading-8 text-gray-300">
-            Look at the computer
-          </h3>
         </div>
       </div>
     </div>
@@ -61,7 +64,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+import { useGetGameQuery, useGetViewerQuery, useVoteMutation } from '~~/graphql/generated/graphql'
 
 const isHost = ref(false)
 
@@ -110,5 +113,29 @@ watch(viewerResult, (newValue) => {
     isHost.value = newValue.viewer.isHost
   }
 }, { immediate: true })
+
+const { mutate: voteMutate } = useVoteMutation()
+
+async function vote (battleParticipantId: string) {
+  if (!viewerResult.value?.viewer?.id) {
+    // eslint-disable-next-line no-console
+    console.error('No viewer ID available.')
+    return
+  }
+
+  try {
+    await voteMutate({
+      input: {
+        battleParticipantId,
+        voterId: viewerResult.value.viewer.id
+      }
+    })
+    // eslint-disable-next-line no-console
+    console.log('Vote submitted.')
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error submitting vote:', error)
+  }
+}
 
 </script>

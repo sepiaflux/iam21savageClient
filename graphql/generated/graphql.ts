@@ -23,7 +23,7 @@ export type Battle = {
   __typename?: 'Battle';
   battleParticipants: Array<BattleParticipant>;
   game: Game;
-  id: Scalars['String'];
+  id: Scalars['ID'];
   roundIndex: Scalars['Int'];
 };
 
@@ -54,7 +54,7 @@ export type BattleParticipant = {
   /** we use a service for this so this is the link to that service */
   audioURL?: Maybe<Scalars['String']>;
   battle: Battle;
-  id: Scalars['String'];
+  id: Scalars['ID'];
   openAIFirstPart?: Maybe<Scalars['String']>;
   participant: User;
   rapText?: Maybe<Scalars['String']>;
@@ -110,7 +110,7 @@ export type Game = {
   __typename?: 'Game';
   battles: Array<Battle>;
   gameCode: Scalars['String'];
-  id: Scalars['String'];
+  id: Scalars['ID'];
   numberOfRounds: Scalars['Int'];
   roundIndex: Scalars['Int'];
   state: GameState;
@@ -157,7 +157,6 @@ export enum GameState {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  /** employee gets created instantly (and if eMail then invited) */
   battleFirstSubmit?: Maybe<BattleFirstSubmitPayload>;
   battleSubmit?: Maybe<BattleSubmitPayload>;
   /** game gets created instantly (and if eMail then invited) */
@@ -239,7 +238,7 @@ export type User = {
   battlesWhereParticipant: Array<BattleParticipant>;
   deviceId: Scalars['String'];
   game: Game;
-  id: Scalars['String'];
+  id: Scalars['ID'];
   isHost: Scalars['Boolean'];
   name: Scalars['String'];
   score: Scalars['Int'];
@@ -262,7 +261,7 @@ export type UserUpdateInput = {
 export type Vote = {
   __typename?: 'Vote';
   battleParticipant: BattleParticipant;
-  id: Scalars['String'];
+  id: Scalars['ID'];
   votee: User;
   voter: User;
 };
@@ -275,7 +274,6 @@ export type VoteCreateInput = {
 
 export type VoteInput = {
   battleParticipantId: Scalars['ID'];
-  voteeId: Scalars['ID'];
   voterId: Scalars['ID'];
 };
 

@@ -1,7 +1,7 @@
 type Battle {
   battleParticipants: [BattleParticipant!]!
   game: Game!
-  id: String!
+  id: ID!
   roundIndex: Int!
 }
 
@@ -31,7 +31,7 @@ type BattleParticipant {
   """we use a service for this so this is the link to that service"""
   audioURL: String
   battle: Battle!
-  id: String!
+  id: ID!
   openAIFirstPart: String
   participant: User!
   rapText: String
@@ -91,7 +91,7 @@ scalar DateTime
 type Game {
   battles: [Battle!]!
   gameCode: String!
-  id: String!
+  id: ID!
   numberOfRounds: Int!
   roundIndex: Int!
   state: GameState!
@@ -134,7 +134,6 @@ enum GameState {
 }
 
 type Mutation {
-  """employee gets created instantly (and if eMail then invited)"""
   battleFirstSubmit(input: BattleFirstSubmitInput!): BattleFirstSubmitPayload
   battleSubmit(input: BattleSubmitInput!): BattleSubmitPayload
 
@@ -173,7 +172,7 @@ type User {
   battlesWhereParticipant: [BattleParticipant!]!
   deviceId: String!
   game: Game!
-  id: String!
+  id: ID!
   isHost: Boolean!
   name: String!
   score: Int!
@@ -195,7 +194,7 @@ input UserUpdateInput {
 
 type Vote {
   battleParticipant: BattleParticipant!
-  id: String!
+  id: ID!
   votee: User!
   voter: User!
 }
@@ -208,7 +207,6 @@ input VoteCreateInput {
 
 input VoteInput {
   battleParticipantId: ID!
-  voteeId: ID!
   voterId: ID!
 }
 

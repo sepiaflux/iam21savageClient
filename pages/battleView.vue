@@ -65,11 +65,11 @@ import { GameState, useGetGameQuery, useGetViewerQuery, useVoteMutation } from '
 
 const isHost = ref(false)
 
-const gameCode = localStorage.getItem('gameCode') as string
+const gameId = localStorage.getItem('gameId') as string
 
 const queryPolling = ref(true)
 const { result: viewerResult, loading, error } = useGetViewerQuery()
-const { result: gameResult } = useGetGameQuery({ gameCode }, () => ({
+const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({
   pollInterval: queryPolling.value ? 1000 : 30000
 }))
 

@@ -42,12 +42,12 @@ const isHost = ref(false)
 const users = ref<UserFragment[]>([])
 const gameState = ref<GameState | null>(null)
 
-const gameCodeStorage = localStorage.getItem('gameCode') as string
-const { result } = useGetGameQuery({ gameCode: gameCodeStorage }, { pollInterval: 1000 })
+const gameId = localStorage.getItem('gameId') as string
+const { result, loading, error } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
 
 const viewerId = localStorage.getItem('viewerId') as string
-const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
-const { result: resultViewer } = useGetViewerQuery()
+const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
+const { result: resultViewer, loading: loadingViewer, error: errorViewer } = useGetViewerQuery()
 
 const gameCode = ref('Loading...')
 
@@ -80,7 +80,7 @@ const { mutate, loading: startGameLoading } = useGameStartMutation()
 
 function startGame () {
   mutate(
-    { input: { gameCode: gameCodeStorage } }
+    { input: { gameId } }
   )
     .then((res) => {
       res?.data?.gameStart?.battles?.forEach((battle) => {

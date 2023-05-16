@@ -122,7 +122,7 @@
             "deprecationReason": null
           },
           {
-            "name": "gameCode",
+            "name": "gameId",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -782,7 +782,7 @@
             "deprecationReason": null
           },
           {
-            "name": "gameCode",
+            "name": "gameId",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -1137,7 +1137,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "gameCode",
+            "name": "gameId",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -1561,17 +1561,17 @@
           },
           {
             "name": "game",
-            "description": "code NOT id",
+            "description": "if no game ID is given, the game is returned, if he has one!",
             "args": [
               {
-                "name": "gameCode",
+                "name": "gameId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "ID",
                     "ofType": null
                   }
                 },
@@ -1868,7 +1868,7 @@
             "deprecationReason": null
           },
           {
-            "name": "gameCode",
+            "name": "gameId",
             "description": null,
             "type": {
               "kind": "SCALAR",

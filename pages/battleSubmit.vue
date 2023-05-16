@@ -51,10 +51,11 @@ const isLoading = ref(false)
 
 const battleId = localStorage.getItem('battleId') as string
 const viewerId = localStorage.getItem('viewerId') as string
+const gameId = localStorage.getItem('gameId') as string
 const users = ref<UserFragment[]>([])
 
-const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
-const { result } = useGetViewerQuery()
+const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
+const { result, loading, error } = useGetViewerQuery()
 const { mutate: submitFirstBattleMutation } = useBattleSubmitMutation()
 
 const openAIFirstPart = computed(() => {

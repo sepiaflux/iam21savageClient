@@ -33,7 +33,8 @@ import { useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql
 
 const isHost = ref(false)
 
-const gameCode = localStorage.getItem('gameCode') as string
+const route = useRoute()
+const gameCode = route.params.gameCode as string
 
 const { result: viewerResult } = useGetViewerQuery()
 const { result: gameResult } = useGetGameQuery({ gameCode })

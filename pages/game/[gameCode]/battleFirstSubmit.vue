@@ -98,7 +98,8 @@ const users = ref<UserFragment[]>([])
 
 const battleId = localStorage.getItem('battleId') as string
 const viewerId = localStorage.getItem('viewerId') as string
-const gameCode = localStorage.getItem('gameCode') as string
+const route = useRoute()
+const gameCode = route.params.gameCode as string
 
 const { result } = useGetViewerQuery()
 const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })

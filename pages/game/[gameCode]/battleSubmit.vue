@@ -49,6 +49,8 @@ const middlePart = ref('')
 const deviceId = ref('')
 const isLoading = ref(false)
 
+const route = useRoute()
+const gameCode = route.params.gameCode as string
 const battleId = localStorage.getItem('battleId') as string
 const viewerId = localStorage.getItem('viewerId') as string
 const users = ref<UserFragment[]>([])
@@ -91,7 +93,7 @@ async function submitMiddlePart () {
       }
     })
     if (battle?.data && battle.data.battleSubmit) {
-      navigateTo('/battleView')
+      navigateTo({ name: 'game-gameCode-battleView', params: { gameCode } })
     }
   } catch (error) {
     // eslint-disable-next-line no-console

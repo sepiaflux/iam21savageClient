@@ -65,7 +65,8 @@ import { GameState, useGetGameQuery, useGetViewerQuery, useVoteMutation } from '
 
 const isHost = ref(false)
 
-const gameCode = localStorage.getItem('gameCode') as string
+const route = useRoute()
+const gameCode = route.params.gameCode as string
 
 const queryPolling = ref(true)
 const { result: viewerResult, loading, error } = useGetViewerQuery()
@@ -139,7 +140,7 @@ async function vote (battleParticipantId: string) {
 watch(gameResult, (newValue) => {
   if (newValue && newValue.game) {
     if (newValue.game.state === GameState.Results) {
-      navigateTo('/viewScore')
+      navigateTo({ name: 'game-gameCode-viewScore', params: { gameCode } })
     }
   }
 })

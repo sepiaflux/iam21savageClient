@@ -50,9 +50,9 @@ function createRoom () {
     .then((res) => {
       if (res?.data?.gameCreate?.user.game.id) {
         localStorage.setItem('viewerId', res.data.gameCreate.user.id)
-        localStorage.setItem('gameCode', res.data.gameCreate.user.game.gameCode)
+        setGameCode(res.data.gameCreate.user.game.gameCode)
+        navigateTo({ name: 'game-gameCode-lobby', params: { gameCode: res.data.gameCreate.user.game.gameCode } })
       }
-      navigateTo('/lobby')
     })
     .catch((err) => {
       // eslint-disable-next-line no-console

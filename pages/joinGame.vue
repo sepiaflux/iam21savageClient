@@ -71,10 +71,10 @@ async function joinGame () {
 
     if (res?.data?.gameJoin?.user) {
       localStorage.setItem('viewerId', res.data.gameJoin.user.id)
-      localStorage.setItem('gameCode', res.data.gameJoin.user.game.gameCode)
+      setGameCode(res.data.gameJoin.user.game.gameCode)
+      navigateTo({ name: 'game-gameCode-lobby', params: { gameCode: res.data.gameJoin.user.game.gameCode } })
       // eslint-disable-next-line no-console
       console.log('Stored items in localStorage') // Log when localStorage is updated
-      navigateTo('/lobby')
     }
   } catch (error) {
     // eslint-disable-next-line no-console

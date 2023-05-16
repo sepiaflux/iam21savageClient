@@ -41,3 +41,27 @@
     </div>
   </div>
 </template>
+
+<script lang="ts" setup>
+import { useGetGameLazyQuery } from '~~/graphql/generated/graphql'
+
+resetState()
+const chosenGameCode = useGameCode()
+const chosenGameOptions = ref({
+  gameCode: chosenGameCode.value || 'placeholder'
+})
+const { result: chosenGameResult, load: loadChosenGame } = useGetGameLazyQuery(chosenGameOptions)
+if (chosenGameCode.value) {
+  chosenGameOptions.value.gameCode = chosenGameCode.value
+  loadChosenGame()
+}
+
+watch(chosenGameCode, (val) => {
+  if (val !== undefined) {
+    chosenGameOptions.value.gameCode = val
+    loadChosenGame()
+  }
+})
+const _chosenGame = computed(() => chosenGameResult.value?.game || undefined)
+
+</script>

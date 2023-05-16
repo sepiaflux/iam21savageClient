@@ -29,7 +29,7 @@ export type Battle = {
 
 export type BattleCreateInput = {
   battleParticipantsCreateInput: Array<BattleParticipantCreateInput>;
-  gameId: Scalars['ID'];
+  gameCode: Scalars['ID'];
   roundIndex: Scalars['Int'];
 };
 
@@ -97,7 +97,7 @@ export type BattleSubmitPayload = {
 
 export type BattleUpdateInput = {
   battleParticipantsCreateInput: Array<BattleParticipantCreateInput>;
-  gameId: Scalars['ID'];
+  gameCode: Scalars['ID'];
   roundIndex: Scalars['Int'];
 };
 
@@ -137,7 +137,7 @@ export type GameJoinPayload = {
 };
 
 export type GameStartInput = {
-  gameId: Scalars['ID'];
+  gameCode: Scalars['ID'];
 };
 
 export type GameStartPayload = {
@@ -206,7 +206,7 @@ export type Query = {
   battle?: Maybe<Battle>;
   battleViewer?: Maybe<Battle>;
   battles: Array<Battle>;
-  /** if no game ID is given, the game is returned, if he has one! */
+  /** code NOT id */
   game?: Maybe<Game>;
   user?: Maybe<User>;
   viewer?: Maybe<User>;
@@ -224,7 +224,7 @@ export type QueryBattleViewerArgs = {
 
 
 export type QueryGameArgs = {
-  gameId: Scalars['ID'];
+  gameCode: Scalars['String'];
 };
 
 
@@ -253,7 +253,7 @@ export type UserCreateInput = {
 export type UserUpdateInput = {
   avatar?: InputMaybe<Scalars['String']>;
   deviceId?: InputMaybe<Scalars['String']>;
-  gameId?: InputMaybe<Scalars['String']>;
+  gameCode?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
   score?: InputMaybe<Scalars['Int']>;
 };
@@ -343,7 +343,7 @@ export type GameStartMutationVariables = Exact<{
 export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipants: Array<{ __typename?: 'BattleParticipant', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } }> }> }> } | null };
 
 export type GetGameQueryVariables = Exact<{
-  gameId: Scalars['ID'];
+  gameCode: Scalars['String'];
 }>;
 
 
@@ -642,8 +642,8 @@ export function useGameStartMutation(options: VueApolloComposable.UseMutationOpt
 }
 export type GameStartMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GameStartMutation, GameStartMutationVariables>;
 export const GetGameDocument = gql`
-    query GetGame($gameId: ID!) {
-  game(gameId: $gameId) {
+    query GetGame($gameCode: String!) {
+  game(gameCode: $gameCode) {
     ...Game
     users {
       ...User
@@ -669,7 +669,7 @@ ${BattleFragmentDoc}`;
  *
  * @example
  * const { result, loading, error } = useGetGameQuery({
- *   gameId: // value for 'gameId'
+ *   gameCode: // value for 'gameCode'
  * });
  */
 export function useGetGameQuery(variables: GetGameQueryVariables | VueCompositionApi.Ref<GetGameQueryVariables> | ReactiveFunction<GetGameQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables>> = {}) {

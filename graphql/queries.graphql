@@ -1,5 +1,5 @@
-query GetGame($gameId: ID!) {
-  game(gameId: $gameId) {
+query GetGame($gameCode: String!) {
+  game(gameCode: $gameCode) {
     ...Game
     users {
       ...User

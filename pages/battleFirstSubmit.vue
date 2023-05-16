@@ -98,10 +98,10 @@ const users = ref<UserFragment[]>([])
 
 const battleId = localStorage.getItem('battleId') as string
 const viewerId = localStorage.getItem('viewerId') as string
-const gameId = localStorage.getItem('gameId') as string
+const gameCode = localStorage.getItem('gameCode') as string
 
-const { result, loading, error } = useGetViewerQuery()
-const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })
+const { result } = useGetViewerQuery()
+const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })
 const { mutate: submitFirstBattleMutation } = useBattleFirstSubmitMutation()
 // use the useGetGameQuery hook to get the game data
 
@@ -118,7 +118,7 @@ watch(resultBattleViewerQuery, (newValue) => {
   }
 }, { immediate: true })
 
-const { result: resultGetGameQuery, loading: loadingGetGameQuery, error: errorGetGameQuery } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
+const { result: resultGetGameQuery } = useGetGameQuery({ gameCode }, { pollInterval: 1000 })
 
 // watch the result of the useGetGameQuery hook and if the state changes
 watch(resultGetGameQuery, (newValue) => {

@@ -49,7 +49,7 @@ const viewerId = localStorage.getItem('viewerId') as string
 const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
 const { result: resultViewer } = useGetViewerQuery()
 
-const gameCode = ref('Loading...')
+const gameCode = ref(gameCodeStorage)
 
 watch(resultViewer, (newValue) => {
   if (newValue && newValue.viewer) {

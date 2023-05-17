@@ -42,6 +42,7 @@ import { useGameCreateMutation } from '~~/graphql/generated/graphql'
 const { mutate, loading } = useGameCreateMutation()
 
 function createRoom () {
+  resetState()
   mutate({
     input: {
       numberOfRounds: 1
@@ -49,10 +50,10 @@ function createRoom () {
   })
     .then((res) => {
       if (res?.data?.gameCreate?.user.game.id) {
-        localStorage.setItem('viewerId', res.data.gameCreate.user.id)
-        localStorage.setItem('gameId', res.data.gameCreate.user.game.id)
+        setViewerId(res.data.gameCreate.user.id)
+        setGameCode(res.data.gameCreate.user.game.gameCode)
+        navigateTo({ name: 'game-gameCode-lobby', params: { gameCode: res.data.gameCreate.user.game.gameCode } })
       }
-      navigateTo('/lobby')
     })
     .catch((err) => {
       // eslint-disable-next-line no-console

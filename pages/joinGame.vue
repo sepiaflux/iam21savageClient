@@ -54,6 +54,8 @@ const gameCode = ref('')
 const { mutate: joinGameMutation } = useGameJoinMutation()
 
 async function joinGame () {
+  resetState()
+  // eslint-disable-next-line no-console
   console.log('joinGame function called') // Log when the function is called
   try {
     const res = await joinGameMutation({
@@ -65,13 +67,15 @@ async function joinGame () {
       }
     })
 
+    // eslint-disable-next-line no-console
     console.log('Mutation response:', res) // Log the response from the mutation
 
     if (res?.data?.gameJoin?.user) {
-      localStorage.setItem('viewerId', res.data.gameJoin.user.id)
-      localStorage.setItem('gameId', res.data.gameJoin.user.game.id)
+      setViewerId(res.data.gameJoin.user.id)
+      setGameCode(res.data.gameJoin.user.game.gameCode)
+      navigateTo({ name: 'game-gameCode-lobby', params: { gameCode: res.data.gameJoin.user.game.gameCode } })
+      // eslint-disable-next-line no-console
       console.log('Stored items in localStorage') // Log when localStorage is updated
-      navigateTo('/lobby')
     }
   } catch (error) {
     // eslint-disable-next-line no-console

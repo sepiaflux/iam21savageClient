@@ -42,14 +42,14 @@ const isHost = ref(false)
 const users = ref<UserFragment[]>([])
 const gameState = ref<GameState | null>(null)
 
-const gameId = localStorage.getItem('gameId') as string
-const { result, loading, error } = useGetGameQuery({ gameId }, { pollInterval: 1000 })
+const gameCodeStorage = useGameCode()
+const { result } = useGetGameQuery({ gameCode: gameCodeStorage.value || 'placeholder' }, { pollInterval: 1000 })
 
-const viewerId = localStorage.getItem('viewerId') as string
-const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
-const { result: resultViewer, loading: loadingViewer, error: errorViewer } = useGetViewerQuery()
+const viewerId = useViewerId()
+const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' }, { pollInterval: 1000 })
+const { result: resultViewer } = useGetViewerQuery()
 
-const gameCode = ref('Loading...')
+const gameCode = ref(gameCodeStorage)
 
 watch(resultViewer, (newValue) => {
   if (newValue && newValue.viewer) {
@@ -64,15 +64,21 @@ watch(result, (newValue) => {
     // Filter out users with isHost set to true
     users.value = newValue.game.users.filter(user => !user.isHost) || []
     gameState.value = newValue.game.state
+
+    if (gameState.value === GameState.Prompt) {
+      navigateTo({ name: 'game-gameCode-battleFirstSubmit', params: { gameCode: gameCodeStorage.value } })
+    }
   }
 }, { immediate: true })
 
 watch([result, resultBattleViewerQuery], ([gameResult, battleViewerResult]) => {
+  // eslint-disable-next-line no-console
+  console.log('battleViewerResult: ' + battleViewerResult?.battleViewer?.id)
   if (gameResult?.game && gameResult.game.state === GameState.Prompt && battleViewerResult?.battleViewer?.id) {
     localStorage.setItem('battleId', battleViewerResult.battleViewer.id)
-    navigateTo('/battleFirstSubmit')
+    navigateTo({ name: 'game-gameCode-battleFirstSubmit', params: { gameCode: gameCodeStorage.value } })
   } else if (isHost.value && gameResult?.game?.state === GameState.Prompt) {
-    navigateTo('/battleFirstSubmit')
+    navigateTo({ name: 'game-gameCode-battleFirstSubmit', params: { gameCode: gameCodeStorage.value } })
   }
 })
 
@@ -80,14 +86,18 @@ const { mutate, loading: startGameLoading } = useGameStartMutation()
 
 function startGame () {
   mutate(
-    { input: { gameId } }
+    {
+      input: {
+        gameCode: gameCodeStorage.value || 'placeholder'
+      }
+    }
   )
     .then((res) => {
       res?.data?.gameStart?.battles?.forEach((battle) => {
         battle.battleParticipants.forEach((battleParticipant) => {
-          if (battleParticipant.participant.id === viewerId) {
+          if (battleParticipant.participant.id === viewerId.value) {
             localStorage.setItem('battleId', battle.id)
-            navigateTo('/battleFirstSubmit')
+            navigateTo({ name: 'game-gameCode-battleFirstSubmit', params: { gameCode: gameCodeStorage.value } })
           }
         })
       })

@@ -65,11 +65,12 @@ import { GameState, useGetGameQuery, useGetViewerQuery, useVoteMutation } from '
 
 const isHost = ref(false)
 
-const gameId = localStorage.getItem('gameId') as string
+const route = useRoute()
+const gameCode = route.params.gameCode as string
 
 const queryPolling = ref(true)
 const { result: viewerResult, loading, error } = useGetViewerQuery()
-const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameId }, () => ({
+const { result: gameResult } = useGetGameQuery({ gameCode }, () => ({
   pollInterval: queryPolling.value ? 1000 : 30000
 }))
 
@@ -139,7 +140,7 @@ async function vote (battleParticipantId: string) {
 watch(gameResult, (newValue) => {
   if (newValue && newValue.game) {
     if (newValue.game.state === GameState.Results) {
-      navigateTo('/viewScore')
+      navigateTo({ name: 'game-gameCode-viewScore', params: { gameCode } })
     }
   }
 })

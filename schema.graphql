@@ -7,7 +7,7 @@ type Battle {
 
 input BattleCreateInput {
   battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
-  gameId: ID!
+  gameCode: ID!
   roundIndex: Int!
 }
 
@@ -73,7 +73,7 @@ type BattleSubmitPayload {
 
 input BattleUpdateInput {
   battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
-  gameId: ID!
+  gameCode: ID!
   roundIndex: Int!
 }
 
@@ -116,7 +116,7 @@ type GameJoinPayload {
 }
 
 input GameStartInput {
-  gameId: ID!
+  gameCode: ID!
 }
 
 type GameStartPayload {
@@ -158,8 +158,8 @@ type Query {
   battleViewer(userId: ID!): Battle
   battles: [Battle!]!
 
-  """if no game ID is given, the game is returned, if he has one!"""
-  game(gameId: ID!): Game
+  """code NOT id"""
+  game(gameCode: String!): Game
   user(id: ID!): User
   viewer: User
 }
@@ -187,7 +187,7 @@ input UserCreateInput {
 input UserUpdateInput {
   avatar: String
   deviceId: String
-  gameId: String
+  gameCode: String
   name: String
   score: Int
 }

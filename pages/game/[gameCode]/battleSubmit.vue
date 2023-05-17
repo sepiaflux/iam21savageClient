@@ -49,13 +49,14 @@ const middlePart = ref('')
 const deviceId = ref('')
 const isLoading = ref(false)
 
+const route = useRoute()
+const gameCode = route.params.gameCode as string
 const battleId = localStorage.getItem('battleId') as string
-const viewerId = localStorage.getItem('viewerId') as string
-const gameId = localStorage.getItem('gameId') as string
+const viewerId = useViewerId()
 const users = ref<UserFragment[]>([])
 
-const { result: resultBattleViewerQuery, loading: loadingBattleViewerQuery, error: errorBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
-const { result, loading, error } = useGetViewerQuery()
+const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' }, { pollInterval: 1000 })
+const { result } = useGetViewerQuery()
 const { mutate: submitFirstBattleMutation } = useBattleSubmitMutation()
 
 const openAIFirstPart = computed(() => {
@@ -63,7 +64,7 @@ const openAIFirstPart = computed(() => {
   console.log('battleParticipants', resultBattleViewerQuery.value?.battleViewer?.battleParticipants)
   const { battleParticipants } = resultBattleViewerQuery.value?.battleViewer || {}
   if (battleParticipants) {
-    const battleParticipant = battleParticipants.find(bp => bp.participant.id === viewerId)
+    const battleParticipant = battleParticipants.find(bp => bp.participant.id === viewerId.value)
     if (battleParticipant) {
       return battleParticipant.openAIFirstPart
     }
@@ -92,7 +93,7 @@ async function submitMiddlePart () {
       }
     })
     if (battle?.data && battle.data.battleSubmit) {
-      navigateTo('/battleView')
+      navigateTo({ name: 'game-gameCode-battleView', params: { gameCode } })
     }
   } catch (error) {
     // eslint-disable-next-line no-console

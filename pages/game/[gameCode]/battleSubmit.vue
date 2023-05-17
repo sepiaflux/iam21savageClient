@@ -52,10 +52,10 @@ const isLoading = ref(false)
 const route = useRoute()
 const gameCode = route.params.gameCode as string
 const battleId = localStorage.getItem('battleId') as string
-const viewerId = localStorage.getItem('viewerId') as string
+const viewerId = useViewerId()
 const users = ref<UserFragment[]>([])
 
-const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId }, { pollInterval: 1000 })
+const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' }, { pollInterval: 1000 })
 const { result } = useGetViewerQuery()
 const { mutate: submitFirstBattleMutation } = useBattleSubmitMutation()
 
@@ -64,7 +64,7 @@ const openAIFirstPart = computed(() => {
   console.log('battleParticipants', resultBattleViewerQuery.value?.battleViewer?.battleParticipants)
   const { battleParticipants } = resultBattleViewerQuery.value?.battleViewer || {}
   if (battleParticipants) {
-    const battleParticipant = battleParticipants.find(bp => bp.participant.id === viewerId)
+    const battleParticipant = battleParticipants.find(bp => bp.participant.id === viewerId.value)
     if (battleParticipant) {
       return battleParticipant.openAIFirstPart
     }

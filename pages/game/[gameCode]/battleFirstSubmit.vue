@@ -97,12 +97,15 @@ const isHost = ref(false)
 const users = ref<UserFragment[]>([])
 
 const battleId = localStorage.getItem('battleId') as string
-const viewerId = localStorage.getItem('viewerId') as string
+const viewerId = useViewerId()
+
+// eslint-disable-next-line no-console
+console.log('viewerId: ', viewerId)
 const route = useRoute()
 const gameCode = route.params.gameCode as string
 
 const { result } = useGetViewerQuery()
-const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId })
+const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' })
 const { mutate: submitFirstBattleMutation } = useBattleFirstSubmitMutation()
 // use the useGetGameQuery hook to get the game data
 
@@ -125,7 +128,7 @@ const { result: resultGetGameQuery } = useGetGameQuery({ gameCode }, { pollInter
 watch(resultGetGameQuery, (newValue) => {
   if (newValue && newValue.game) {
     if (isHost.value && newValue.game.state === GameState.Voting) {
-      navigateTo('/battleView')
+      navigateTo({ name: 'game-gameCode-battleView', params: { gameCode } })
     }
   }
 })
@@ -144,7 +147,7 @@ async function submitBattle () {
     })
 
     if (battleParticipant?.data && battleParticipant.data.battleFirstSubmit) {
-      navigateTo('/battleSubmit')
+      navigateTo({ name: 'game-gameCode-battleSubmit', params: { gameCode } })
     }
   } catch (error) {
     // eslint-disable-next-line no-console

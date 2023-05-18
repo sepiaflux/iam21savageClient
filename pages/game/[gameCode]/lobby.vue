@@ -35,15 +35,15 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { GameState, UserFragment, useGameStartMutation, useGetBattleViewerQuery, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+import { GameState, useGameStartMutation, useGameSubSubscription, useGetBattleViewerQuery, useGetViewerQuery, useGetGameQuery } from '~~/graphql/generated/graphql'
 
 const deviceId = ref('')
 const isHost = ref(false)
-const users = ref<UserFragment[]>([])
 const gameState = ref<GameState | null>(null)
 
 const gameCodeStorage = useGameCode()
-const { result } = useGetGameQuery({ gameCode: gameCodeStorage.value || 'placeholder' }, { pollInterval: 1000 })
+const { result } = useGetGameQuery({ gameCode: gameCodeStorage.value || 'placeholder' })
+const { result: resultGameSub } = useGameSubSubscription({ gameCode: gameCodeStorage.value || 'placeholder' })
 
 const viewerId = useViewerId()
 const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' }, { pollInterval: 1000 })
@@ -58,11 +58,13 @@ watch(resultViewer, (newValue) => {
   }
 }, { immediate: true })
 
-watch(result, (newValue) => {
+const users = computed(() => {
+  return result.value?.game?.users.filter(user => !user.isHost) || []
+})
+
+watch(resultGameSub, (newValue) => {
   if (newValue && newValue.game) {
-    gameCode.value = newValue.game.gameCode || 'GameCode Fehler'
     // Filter out users with isHost set to true
-    users.value = newValue.game.users.filter(user => !user.isHost) || []
     gameState.value = newValue.game.state
 
     if (gameState.value === GameState.Prompt) {

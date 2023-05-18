@@ -232,6 +232,17 @@ export type QueryUserArgs = {
   id: Scalars['ID'];
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  /** code NOT id */
+  game?: Maybe<Game>;
+};
+
+
+export type SubscriptionGameArgs = {
+  gameCode: Scalars['String'];
+};
+
 export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
@@ -379,6 +390,13 @@ export type GetViewerQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetViewerQuery = { __typename?: 'Query', viewer?: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } | null };
+
+export type GameSubSubscriptionVariables = Exact<{
+  gameCode: Scalars['String'];
+}>;
+
+
+export type GameSubSubscription = { __typename?: 'Subscription', game?: { __typename?: 'Game', state: GameState } | null };
 
 export const UserFragmentDoc = gql`
     fragment User on User {
@@ -823,3 +841,30 @@ export function useGetViewerLazyQuery(options: VueApolloComposable.UseQueryOptio
   return VueApolloComposable.useLazyQuery<GetViewerQuery, GetViewerQueryVariables>(GetViewerDocument, {}, options);
 }
 export type GetViewerQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetViewerQuery, GetViewerQueryVariables>;
+export const GameSubDocument = gql`
+    subscription GameSub($gameCode: String!) {
+  game(gameCode: $gameCode) {
+    state
+  }
+}
+    `;
+
+/**
+ * __useGameSubSubscription__
+ *
+ * To run a query within a Vue component, call `useGameSubSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useGameSubSubscription` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the subscription
+ * @param options that will be passed into the subscription, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/subscription.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGameSubSubscription({
+ *   gameCode: // value for 'gameCode'
+ * });
+ */
+export function useGameSubSubscription(variables: GameSubSubscriptionVariables | VueCompositionApi.Ref<GameSubSubscriptionVariables> | ReactiveFunction<GameSubSubscriptionVariables>, options: VueApolloComposable.UseSubscriptionOptions<GameSubSubscription, GameSubSubscriptionVariables> | VueCompositionApi.Ref<VueApolloComposable.UseSubscriptionOptions<GameSubSubscription, GameSubSubscriptionVariables>> | ReactiveFunction<VueApolloComposable.UseSubscriptionOptions<GameSubSubscription, GameSubSubscriptionVariables>> = {}) {
+  return VueApolloComposable.useSubscription<GameSubSubscription, GameSubSubscriptionVariables>(GameSubDocument, variables, options);
+}
+export type GameSubSubscriptionCompositionFunctionResult = VueApolloComposable.UseSubscriptionReturn<GameSubSubscription, GameSubSubscriptionVariables>;

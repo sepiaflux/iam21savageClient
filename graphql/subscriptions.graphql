@@ -1,1 +1,5 @@
-subscription 
+subscription GameSub($gameCode: String!) {
+  game(gameCode: $gameCode) {
+    state
+  }
+}

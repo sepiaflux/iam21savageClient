@@ -164,6 +164,11 @@ type Query {
   viewer: User
 }
 
+type Subscription {
+  """code NOT id"""
+  game(gameCode: String!): Game
+}
+
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 

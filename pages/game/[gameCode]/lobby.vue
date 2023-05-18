@@ -35,14 +35,15 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { GameState, useGameStartMutation, useGameSubSubscription, useGetBattleViewerQuery, useGetViewerQuery, useGetGameQuery } from '~~/graphql/generated/graphql'
+import { GameState, UserFragment, useGameStartMutation, useGameSubSubscription, useGetBattleViewerQuery, useGetViewerQuery, useGetGameQuery } from '~~/graphql/generated/graphql'
 
 const deviceId = ref('')
 const isHost = ref(false)
 const gameState = ref<GameState | null>(null)
+const users = ref<UserFragment[]>([])
 
 const gameCodeStorage = useGameCode()
-const { result } = useGetGameQuery({ gameCode: gameCodeStorage.value || 'placeholder' })
+const { result } = useGetGameQuery({ gameCode: gameCodeStorage.value || 'placeholder' }, { pollInterval: 1000 })
 const { result: resultGameSub } = useGameSubSubscription({ gameCode: gameCodeStorage.value || 'placeholder' })
 
 const viewerId = useViewerId()
@@ -58,9 +59,11 @@ watch(resultViewer, (newValue) => {
   }
 }, { immediate: true })
 
-const users = computed(() => {
-  return result.value?.game?.users.filter(user => !user.isHost) || []
-})
+watch(result, (newValue) => {
+  if (newValue && newValue.game) {
+    users.value = newValue.game.users.filter(user => !user.isHost) || []
+  }
+}, { immediate: true })
 
 watch(resultGameSub, (newValue) => {
   if (newValue && newValue.game) {

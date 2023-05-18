@@ -11,12 +11,14 @@
           Unser Spiel macht VIEL Spaß.
         </p>
         <div class="mt-4 place-items-center gap-4 grid grid-cols-1">
-          <NuxtLink
-            to="/createGame"
+          <button
+            :disabled="loading"
+            :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
             class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            @click="createRoom"
           >
             RAUM ERSTELLEN
-          </NuxtLink>
+          </button>
           <NuxtLink
             to="/joinGame"
             class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -43,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useGetGameLazyQuery } from '~~/graphql/generated/graphql'
+import { useGameCreateMutation, useGetGameLazyQuery } from '~~/graphql/generated/graphql'
 
 resetState()
 const chosenGameCode = useGameCode()
@@ -62,6 +64,29 @@ watch(chosenGameCode, (val) => {
     loadChosenGame()
   }
 })
+
 const _chosenGame = computed(() => chosenGameResult.value?.game || undefined)
 
+// Moved from createGame.vue
+const { mutate, loading } = useGameCreateMutation()
+
+function createRoom () {
+  resetState()
+  mutate({
+    input: {
+      numberOfRounds: 1
+    }
+  })
+    .then((res) => {
+      if (res?.data?.gameCreate?.user.game.id) {
+        setViewerId(res.data.gameCreate.user.id)
+        setGameCode(res.data.gameCreate.user.game.gameCode)
+        navigateTo({ name: 'game-gameCode-lobby', params: { gameCode: res.data.gameCreate.user.game.gameCode } })
+      }
+    })
+    .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error(err)
+    })
+}
 </script>

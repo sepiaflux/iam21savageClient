@@ -85,7 +85,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { GameState, UserFragment, useBattleFirstSubmitMutation, useGetBattleViewerQuery, useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+import { GameState, UserFragment, useBattleFirstSubmitMutation, useGameSubSubscription, useGetBattleViewerQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
 const attribute1 = ref('')
 const attribute2 = ref('')
@@ -105,10 +105,6 @@ const route = useRoute()
 const gameCode = route.params.gameCode as string
 
 const { result } = useGetViewerQuery()
-const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' })
-const { mutate: submitFirstBattleMutation } = useBattleFirstSubmitMutation()
-// use the useGetGameQuery hook to get the game data
-
 watch(result, (newValue) => {
   if (newValue && newValue.viewer) {
     deviceId.value = newValue.viewer.deviceId || ''
@@ -116,23 +112,24 @@ watch(result, (newValue) => {
   }
 }, { immediate: true })
 
+const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' })
 watch(resultBattleViewerQuery, (newValue) => {
   if (newValue && newValue.battleViewer) {
     users.value = newValue.battleViewer.battleParticipants.map(participant => participant.participant)
   }
 }, { immediate: true })
 
-const { result: resultGetGameQuery } = useGetGameQuery({ gameCode }, { pollInterval: 1000 })
+const { result: resultGameSub } = useGameSubSubscription({ gameCode: gameCode || 'placeholder' })
 
-// watch the result of the useGetGameQuery hook and if the state changes
-watch(resultGetGameQuery, (newValue) => {
+watch(resultGameSub, (newValue) => {
   if (newValue && newValue.game) {
     if (isHost.value && newValue.game.state === GameState.Voting) {
       navigateTo({ name: 'game-gameCode-battleView', params: { gameCode } })
     }
   }
-})
+}, { immediate: true })
 
+const { mutate: submitFirstBattleMutation } = useBattleFirstSubmitMutation()
 async function submitBattle () {
   isLoading.value = true
   try {

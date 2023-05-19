@@ -39,19 +39,15 @@ import { GameState, UserFragment, useGameStartMutation, useGameSubSubscription, 
 
 const deviceId = ref('')
 const isHost = ref(false)
-const gameState = ref<GameState | null>(null)
 const users = ref<UserFragment[]>([])
 
 const gameCodeStorage = useGameCode()
-const { result } = useGetGameQuery({ gameCode: gameCodeStorage.value || 'placeholder' }, { pollInterval: 1000 })
-const { result: resultGameSub } = useGameSubSubscription({ gameCode: gameCodeStorage.value || 'placeholder' })
 
 const viewerId = useViewerId()
-const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' }, { pollInterval: 1000 })
-const { result: resultViewer } = useGetViewerQuery()
 
 const gameCode = ref(gameCodeStorage)
 
+const { result: resultViewer } = useGetViewerQuery()
 watch(resultViewer, (newValue) => {
   if (newValue && newValue.viewer) {
     deviceId.value = newValue.viewer.deviceId || ''
@@ -59,23 +55,23 @@ watch(resultViewer, (newValue) => {
   }
 }, { immediate: true })
 
+const { result } = useGetGameQuery({ gameCode: gameCodeStorage.value || 'placeholder' }, { pollInterval: 1000 })
 watch(result, (newValue) => {
   if (newValue && newValue.game) {
     users.value = newValue.game.users.filter(user => !user.isHost) || []
   }
 }, { immediate: true })
 
+const { result: resultGameSub } = useGameSubSubscription({ gameCode: gameCodeStorage.value || 'placeholder' })
 watch(resultGameSub, (newValue) => {
   if (newValue && newValue.game) {
-    // Filter out users with isHost set to true
-    gameState.value = newValue.game.state
-
-    if (gameState.value === GameState.Prompt) {
+    if (newValue.game.state === GameState.Prompt) {
       navigateTo({ name: 'game-gameCode-battleFirstSubmit', params: { gameCode: gameCodeStorage.value } })
     }
   }
 }, { immediate: true })
 
+const { result: resultBattleViewerQuery } = useGetBattleViewerQuery({ userId: viewerId.value || 'placeholder' }, { pollInterval: 1000 })
 watch([result, resultBattleViewerQuery], ([gameResult, battleViewerResult]) => {
   // eslint-disable-next-line no-console
   console.log('battleViewerResult: ' + battleViewerResult?.battleViewer?.id)

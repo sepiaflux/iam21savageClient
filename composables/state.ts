@@ -4,6 +4,11 @@ export function setGameCode (gameCode: string) {
   localStorage.setItem('gameCode', gameCode)
   chosenGameCode.value = gameCode
 }
+export function resetGameCode () {
+  const chosenGameCode = useGameCode()
+  localStorage.removeItem('gameCode')
+  chosenGameCode.value = undefined
+}
 
 export const useViewerId = () => useState<string|undefined>('viewerId', () => localStorage.getItem('viewerId') || undefined)
 export function setViewerId (viewerId: string) {

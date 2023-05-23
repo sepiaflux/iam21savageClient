@@ -1649,7 +1649,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "UserCreateInput",
+                    "name": "UserCreateMutationInput",
                     "ofType": null
                   }
                 },

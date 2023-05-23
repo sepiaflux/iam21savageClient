@@ -220,7 +220,7 @@ export type MutationGameStartArgs = {
 
 
 export type MutationUserCreateArgs = {
-  input: UserCreateInput;
+  input: UserCreateMutationInput;
 };
 
 
@@ -425,7 +425,7 @@ export type GameStartMutationVariables = Exact<{
 export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipants: Array<{ __typename?: 'BattleParticipant', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } }> }> }> } | null };
 
 export type UserCreateMutationVariables = Exact<{
-  input: UserCreateInput;
+  input: UserCreateMutationInput;
 }>;
 
 
@@ -747,7 +747,7 @@ export function useGameStartMutation(options: VueApolloComposable.UseMutationOpt
 }
 export type GameStartMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GameStartMutation, GameStartMutationVariables>;
 export const UserCreateDocument = gql`
-    mutation UserCreate($input: UserCreateInput!) {
+    mutation UserCreate($input: UserCreateMutationInput!) {
   userCreate(input: $input) {
     user {
       ...User

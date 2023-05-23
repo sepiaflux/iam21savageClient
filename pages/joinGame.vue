@@ -87,6 +87,7 @@ const selectedAdlibs = ref<Adlib[]>([Adlib.Datway, Adlib.Twentyone])
 const selectedSvcModel = ref<SvcModel>(SvcModel.Drake)
 const adlibs = ref(Object.values(Adlib))
 const svcModels = ref(Object.values(SvcModel))
+const username = ref('')
 
 const { mutate: joinGameMutation } = useGameJoinMutation()
 const { mutate: userCreateMutation } = useUserCreateMutation()
@@ -94,7 +95,15 @@ const { mutate: userCreateMutation } = useUserCreateMutation()
 async function joinGame () {
   resetState()
   if (!viewerId.value) {
-    viewerId.value = (await userCreateMutation())?.data?.userCreate?.user.id
+    viewerId.value = (await userCreateMutation({
+      input: {
+        user: {
+          name: username.value
+        }
+      }
+    }))?.data?.userCreate?.user.id
+    // eslint-disable-next-line no-console
+    console.log('Created new user', viewerId.value)
   }
   if (!viewerId.value) { throw new Error('No viewerId') }
   // eslint-disable-next-line no-console

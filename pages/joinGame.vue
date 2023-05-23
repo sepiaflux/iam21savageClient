@@ -7,20 +7,6 @@
         </p>
         <form class="mt-6 place-items-center gap-6 grid grid-cols-1" @submit.prevent="joinGame">
           <div class="max-w-md">
-            <label for="first-name" class="block text-sm font-medium leading-6 text-gray-300">Benutzername</label>
-            <div class="mt-1">
-              <input
-                id="first-name"
-                v-model="username"
-                required
-                type="text"
-                name="first-name"
-                autocomplete="given-name"
-                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              >
-            </div>
-          </div>
-          <div class="max-w-md">
             <label for="code" class="block text-sm font-medium leading-6 text-gray-300">Code</label>
             <div class="mt-1">
               <input
@@ -79,7 +65,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { Adlib, SvcModel, useGameJoinMutation, useGetViewerQuery, useUserCreateMutation } from '~~/graphql/generated/graphql'
+import { Adlib, SvcModel, useGameJoinMutation } from '~~/graphql/generated/graphql'
 
 const viewerId = useViewerId()
 const gameCode = ref('')
@@ -87,25 +73,11 @@ const selectedAdlibs = ref<Adlib[]>([Adlib.Datway, Adlib.Twentyone])
 const selectedSvcModel = ref<SvcModel>(SvcModel.Drake)
 const adlibs = ref(Object.values(Adlib))
 const svcModels = ref(Object.values(SvcModel))
-const username = ref('')
 
 const { mutate: joinGameMutation } = useGameJoinMutation()
-const { mutate: userCreateMutation } = useUserCreateMutation()
-const { error } = useGetViewerQuery()
 
 async function joinGame () {
   resetState()
-  if (!viewerId.value || error) {
-    viewerId.value = (await userCreateMutation({
-      input: {
-        user: {
-          name: username.value
-        }
-      }
-    }))?.data?.userCreate?.user.id
-    // eslint-disable-next-line no-console
-    console.log('Created new user', viewerId.value)
-  }
 
   if (!viewerId.value) { throw new Error('No viewerId') }
   // eslint-disable-next-line no-console

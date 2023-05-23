@@ -24,16 +24,16 @@ mutation Vote($input: VoteInput!) {
 
 mutation GameCreate($input: GameCreateInput!) {
   gameCreate(input: $input) {
-    user {
-      ...FullUser
+    gameUserLink {
+      ...GameUserLink
     }
   }
 }
 
 mutation GameJoin($input: GameJoinInput!) {
   gameJoin(input: $input) {
-    user {
-      ...FullUser
+    gameUserLink {
+      ...GameUserLink
     }
   }
 }

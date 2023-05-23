@@ -1,8 +1,14 @@
 query GetGame($gameCode: String!) {
   game(gameCode: $gameCode) {
     ...Game
-    users {
-      ...User
+    gameUserLink {
+      ...GameUserLink
+      game {
+        ...Game
+      }
+      user {
+        ...User
+      }
     }
     battles {
       ...Battle

@@ -1,3 +1,14 @@
+enum Adlib {
+  datway
+  drip
+  itsLit
+  splash
+  straightUp
+  twentyone
+  wuh
+  yuh
+}
+
 type Battle {
   battleParticipants: [BattleParticipant!]!
   game: Game!
@@ -91,11 +102,11 @@ scalar DateTime
 type Game {
   battles: [Battle!]!
   gameCode: String!
+  gameUserLink: [GameUserLink!]!
   id: ID!
   numberOfRounds: Int!
   roundIndex: Int!
   state: GameState!
-  users: [User!]!
 }
 
 input GameCreateInput {
@@ -103,16 +114,18 @@ input GameCreateInput {
 }
 
 type GameCreatePayload {
-  user: User!
+  gameUserLink: GameUserLink!
 }
 
 input GameJoinInput {
+  SVCModel: SVCModel!
+  adlibs: [Adlib!]!
   gameCode: ID!
-  user: UserCreateInput!
+  userId: ID!
 }
 
 type GameJoinPayload {
-  user: User!
+  gameUserLink: GameUserLink!
 }
 
 input GameStartInput {
@@ -133,17 +146,21 @@ enum GameState {
   WaitingToJoin
 }
 
+type GameUserLink {
+  SVCModel: SVCModel!
+  adlibs: [Adlib!]!
+  game: Game!
+  id: ID!
+  user: User!
+}
+
 type Mutation {
   battleFirstSubmit(input: BattleFirstSubmitInput!): BattleFirstSubmitPayload
   battleSubmit(input: BattleSubmitInput!): BattleSubmitPayload
 
   """game gets created instantly (and if eMail then invited)"""
   connectToCloudFunc: ConnectToCloudFuncPayload
-
-  """game gets created instantly (and if eMail then invited)"""
   gameCreate(input: GameCreateInput!): GameCreatePayload
-
-  """game gets created instantly (and if eMail then invited)"""
   gameJoin(input: GameJoinInput!): GameJoinPayload
 
   """game gets created instantly (and if eMail then invited)"""
@@ -164,6 +181,44 @@ type Query {
   viewer: User
 }
 
+enum SVCModel {
+  PARTYNEXTDOOR
+  XXXTENTACION
+  andersonPaak
+  asapRocky
+  beyonce
+  black
+  camila
+  carti
+  childishGambino
+  drake
+  earlSweatshirt
+  eminem
+  frankOcean
+  gambino
+  juiceHigh
+  kanye
+  kendrick
+  kidCudi
+  lilBaby
+  lilNasX
+  lilUziVert
+  michaelJackson
+  nickyMinaj
+  oliviaRodriguez
+  quavo
+  sza
+  taylorSwift
+  trippieRed
+  weeknd
+  youngThug
+}
+
+type Subscription {
+  """code NOT id"""
+  game(gameCode: String!): Game
+}
+
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
@@ -171,7 +226,7 @@ type User {
   avatar: String
   battlesWhereParticipant: [BattleParticipant!]!
   deviceId: String!
-  game: Game!
+  gameUserLink: [GameUserLink!]!
   id: ID!
   isHost: Boolean!
   name: String!

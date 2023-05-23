@@ -7,10 +7,24 @@ fragment User on User {
   isHost
 }
 
-fragment FullUser on User {
-  ...User
+fragment GameUserLink on GameUserLink {
+  id
+  user {
+    ...User
+  }
   game {
     ...Game
+  }
+  SVCModel
+  adlibs
+}
+
+fragment FullUser on User {
+  ...User
+  gameUserLink {
+    game {
+    ...Game
+    }
   }
 }
 

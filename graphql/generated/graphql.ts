@@ -19,6 +19,17 @@ export type Scalars = {
   Upload: any;
 };
 
+export enum Adlib {
+  Datway = 'datway',
+  Drip = 'drip',
+  ItsLit = 'itsLit',
+  Splash = 'splash',
+  StraightUp = 'straightUp',
+  Twentyone = 'twentyone',
+  Wuh = 'wuh',
+  Yuh = 'yuh'
+}
+
 export type Battle = {
   __typename?: 'Battle';
   battleParticipants: Array<BattleParticipant>;
@@ -110,11 +121,11 @@ export type Game = {
   __typename?: 'Game';
   battles: Array<Battle>;
   gameCode: Scalars['String'];
+  gameUserLink: Array<GameUserLink>;
   id: Scalars['ID'];
   numberOfRounds: Scalars['Int'];
   roundIndex: Scalars['Int'];
   state: GameState;
-  users: Array<User>;
 };
 
 export type GameCreateInput = {
@@ -123,17 +134,19 @@ export type GameCreateInput = {
 
 export type GameCreatePayload = {
   __typename?: 'GameCreatePayload';
-  user: User;
+  gameUserLink: GameUserLink;
 };
 
 export type GameJoinInput = {
+  SVCModel: SvcModel;
+  adlibs: Array<Adlib>;
   gameCode: Scalars['ID'];
-  user: UserCreateInput;
+  userId: Scalars['ID'];
 };
 
 export type GameJoinPayload = {
   __typename?: 'GameJoinPayload';
-  user: User;
+  gameUserLink: GameUserLink;
 };
 
 export type GameStartInput = {
@@ -155,15 +168,22 @@ export enum GameState {
   WaitingToJoin = 'WaitingToJoin'
 }
 
+export type GameUserLink = {
+  __typename?: 'GameUserLink';
+  SVCModel: SvcModel;
+  adlibs: Array<Adlib>;
+  game: Game;
+  id: Scalars['ID'];
+  user: User;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   battleFirstSubmit?: Maybe<BattleFirstSubmitPayload>;
   battleSubmit?: Maybe<BattleSubmitPayload>;
   /** game gets created instantly (and if eMail then invited) */
   connectToCloudFunc?: Maybe<ConnectToCloudFuncPayload>;
-  /** game gets created instantly (and if eMail then invited) */
   gameCreate?: Maybe<GameCreatePayload>;
-  /** game gets created instantly (and if eMail then invited) */
   gameJoin?: Maybe<GameJoinPayload>;
   /** game gets created instantly (and if eMail then invited) */
   gameStart?: Maybe<GameStartPayload>;
@@ -232,12 +252,56 @@ export type QueryUserArgs = {
   id: Scalars['ID'];
 };
 
+export enum SvcModel {
+  Partynextdoor = 'PARTYNEXTDOOR',
+  Xxxtentacion = 'XXXTENTACION',
+  AndersonPaak = 'andersonPaak',
+  AsapRocky = 'asapRocky',
+  Beyonce = 'beyonce',
+  Black = 'black',
+  Camila = 'camila',
+  Carti = 'carti',
+  ChildishGambino = 'childishGambino',
+  Drake = 'drake',
+  EarlSweatshirt = 'earlSweatshirt',
+  Eminem = 'eminem',
+  FrankOcean = 'frankOcean',
+  Gambino = 'gambino',
+  JuiceHigh = 'juiceHigh',
+  Kanye = 'kanye',
+  Kendrick = 'kendrick',
+  KidCudi = 'kidCudi',
+  LilBaby = 'lilBaby',
+  LilNasX = 'lilNasX',
+  LilUziVert = 'lilUziVert',
+  MichaelJackson = 'michaelJackson',
+  NickyMinaj = 'nickyMinaj',
+  OliviaRodriguez = 'oliviaRodriguez',
+  Quavo = 'quavo',
+  Sza = 'sza',
+  TaylorSwift = 'taylorSwift',
+  TrippieRed = 'trippieRed',
+  Weeknd = 'weeknd',
+  YoungThug = 'youngThug'
+}
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  /** code NOT id */
+  game?: Maybe<Game>;
+};
+
+
+export type SubscriptionGameArgs = {
+  gameCode: Scalars['String'];
+};
+
 export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
   battlesWhereParticipant: Array<BattleParticipant>;
   deviceId: Scalars['String'];
-  game: Game;
+  gameUserLink: Array<GameUserLink>;
   id: Scalars['ID'];
   isHost: Scalars['Boolean'];
   name: Scalars['String'];
@@ -290,7 +354,9 @@ export type VoteUpdateInput = {
 
 export type UserFragment = { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean };
 
-export type FullUserFragment = { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } };
+export type GameUserLinkFragment = { __typename?: 'GameUserLink', id: string, SVCModel: SvcModel, adlibs: Array<Adlib>, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } };
+
+export type FullUserFragment = { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean, gameUserLink: Array<{ __typename?: 'GameUserLink', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> };
 
 export type GameFragment = { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState };
 
@@ -326,14 +392,14 @@ export type GameCreateMutationVariables = Exact<{
 }>;
 
 
-export type GameCreateMutation = { __typename?: 'Mutation', gameCreate?: { __typename?: 'GameCreatePayload', user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
+export type GameCreateMutation = { __typename?: 'Mutation', gameCreate?: { __typename?: 'GameCreatePayload', gameUserLink: { __typename?: 'GameUserLink', id: string, SVCModel: SvcModel, adlibs: Array<Adlib>, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
 
 export type GameJoinMutationVariables = Exact<{
   input: GameJoinInput;
 }>;
 
 
-export type GameJoinMutation = { __typename?: 'Mutation', gameJoin?: { __typename?: 'GameJoinPayload', user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
+export type GameJoinMutation = { __typename?: 'Mutation', gameJoin?: { __typename?: 'GameJoinPayload', gameUserLink: { __typename?: 'GameUserLink', id: string, SVCModel: SvcModel, adlibs: Array<Adlib>, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
 
 export type GameStartMutationVariables = Exact<{
   input: GameStartInput;
@@ -347,7 +413,7 @@ export type GetGameQueryVariables = Exact<{
 }>;
 
 
-export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, users: Array<{ __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }>, battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipants: Array<{ __typename?: 'BattleParticipant', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } }> }> }> } | null };
+export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, gameUserLink: Array<{ __typename?: 'GameUserLink', id: string, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } }>, battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipants: Array<{ __typename?: 'BattleParticipant', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } }> }> }> } | null };
 
 export type GetUserQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -399,11 +465,27 @@ export const GameFragmentDoc = gql`
   state
 }
     `;
+export const GameUserLinkFragmentDoc = gql`
+    fragment GameUserLink on GameUserLink {
+  id
+  user {
+    ...User
+  }
+  game {
+    ...Game
+  }
+  SVCModel
+  adlibs
+}
+    ${UserFragmentDoc}
+${GameFragmentDoc}`;
 export const FullUserFragmentDoc = gql`
     fragment FullUser on User {
   ...User
-  game {
-    ...Game
+  gameUserLink {
+    game {
+      ...Game
+    }
   }
 }
     ${UserFragmentDoc}
@@ -547,12 +629,12 @@ export type VoteMutationCompositionFunctionResult = VueApolloComposable.UseMutat
 export const GameCreateDocument = gql`
     mutation GameCreate($input: GameCreateInput!) {
   gameCreate(input: $input) {
-    user {
-      ...FullUser
+    gameUserLink {
+      ...GameUserLink
     }
   }
 }
-    ${FullUserFragmentDoc}`;
+    ${GameUserLinkFragmentDoc}`;
 
 /**
  * __useGameCreateMutation__
@@ -578,12 +660,12 @@ export type GameCreateMutationCompositionFunctionResult = VueApolloComposable.Us
 export const GameJoinDocument = gql`
     mutation GameJoin($input: GameJoinInput!) {
   gameJoin(input: $input) {
-    user {
-      ...FullUser
+    gameUserLink {
+      ...GameUserLink
     }
   }
 }
-    ${FullUserFragmentDoc}`;
+    ${GameUserLinkFragmentDoc}`;
 
 /**
  * __useGameJoinMutation__
@@ -645,8 +727,14 @@ export const GetGameDocument = gql`
     query GetGame($gameCode: String!) {
   game(gameCode: $gameCode) {
     ...Game
-    users {
-      ...User
+    gameUserLink {
+      ...GameUserLink
+      game {
+        ...Game
+      }
+      user {
+        ...User
+      }
     }
     battles {
       ...Battle
@@ -654,6 +742,7 @@ export const GetGameDocument = gql`
   }
 }
     ${GameFragmentDoc}
+${GameUserLinkFragmentDoc}
 ${UserFragmentDoc}
 ${BattleFragmentDoc}`;
 

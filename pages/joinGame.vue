@@ -69,11 +69,11 @@ async function joinGame () {
 
     // eslint-disable-next-line no-console
     console.log('Mutation response:', res) // Log the response from the mutation
-
-    if (res?.data?.gameJoin?.user) {
-      setViewerId(res.data.gameJoin.user.id)
-      setGameCode(res.data.gameJoin.user.game.gameCode)
-      navigateTo({ name: 'game-gameCode-lobby', params: { gameCode: res.data.gameJoin.user.game.gameCode } })
+    const gameUserLink = res?.data?.gameJoin?.gameUserLink
+    if (gameUserLink) {
+      setViewerId(gameUserLink.user.id)
+      setGameCode(gameUserLink.game.gameCode)
+      navigateTo({ name: 'game-gameCode-lobby', params: { gameCode: gameUserLink.game.gameCode } })
       // eslint-disable-next-line no-console
       console.log('Stored items in localStorage') // Log when localStorage is updated
     }

@@ -48,3 +48,11 @@ mutation GameStart($input: GameStartInput!) {
     }
   }
 }
+
+mutation UserCreate($input: UserCreateInput!) {
+  userCreate(input: $input) {
+    user {
+      ...User
+    }
+  }
+}

@@ -46,24 +46,29 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useGameJoinMutation } from '~~/graphql/generated/graphql'
+import { Adlib, SvcModel, useGameJoinMutation, useUserCreateMutation } from '~~/graphql/generated/graphql'
 
-const username = ref('')
+const viewerId = useViewerId()
 const gameCode = ref('')
 
 const { mutate: joinGameMutation } = useGameJoinMutation()
+const { mutate: userCreateMutation } = useUserCreateMutation()
 
 async function joinGame () {
   resetState()
+  if (!viewerId.value) {
+    viewerId.value = (await userCreateMutation())?.data?.userCreate?.user.id
+  }
+  if (!viewerId.value) { throw new Error('No viewerId') }
   // eslint-disable-next-line no-console
   console.log('joinGame function called') // Log when the function is called
   try {
     const res = await joinGameMutation({
       input: {
         gameCode: gameCode.value,
-        user: {
-          name: username.value
-        }
+        SVCModel: SvcModel.Drake,
+        adlibs: [Adlib.Twentyone],
+        userId: viewerId.value
       }
     })
 

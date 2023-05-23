@@ -13,9 +13,6 @@ export function setViewerId (viewerId: string) {
 }
 
 export function resetState () {
-  localStorage.clear()
   const gameCode = useGameCode()
   gameCode.value = undefined
-  const viewerId = useViewerId()
-  viewerId.value = undefined
 }

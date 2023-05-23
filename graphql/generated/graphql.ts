@@ -187,6 +187,8 @@ export type Mutation = {
   gameJoin?: Maybe<GameJoinPayload>;
   /** game gets created instantly (and if eMail then invited) */
   gameStart?: Maybe<GameStartPayload>;
+  /** game gets created instantly (and if eMail then invited) */
+  userCreate?: Maybe<UserCreatePayload>;
   /** employee gets created instantly (and if eMail then invited) */
   vote?: Maybe<VotePayload>;
 };
@@ -214,6 +216,11 @@ export type MutationGameJoinArgs = {
 
 export type MutationGameStartArgs = {
   input: GameStartInput;
+};
+
+
+export type MutationUserCreateArgs = {
+  input: UserCreateInput;
 };
 
 
@@ -314,6 +321,15 @@ export type UserCreateInput = {
   name: Scalars['String'];
 };
 
+export type UserCreateMutationInput = {
+  user: UserCreateInput;
+};
+
+export type UserCreatePayload = {
+  __typename?: 'UserCreatePayload';
+  user: User;
+};
+
 export type UserUpdateInput = {
   avatar?: InputMaybe<Scalars['String']>;
   deviceId?: InputMaybe<Scalars['String']>;
@@ -407,6 +423,13 @@ export type GameStartMutationVariables = Exact<{
 
 
 export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipants: Array<{ __typename?: 'BattleParticipant', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } }> }> }> } | null };
+
+export type UserCreateMutationVariables = Exact<{
+  input: UserCreateInput;
+}>;
+
+
+export type UserCreateMutation = { __typename?: 'Mutation', userCreate?: { __typename?: 'UserCreatePayload', user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, deviceId: string, isHost: boolean } } | null };
 
 export type GetGameQueryVariables = Exact<{
   gameCode: Scalars['String'];
@@ -723,6 +746,37 @@ export function useGameStartMutation(options: VueApolloComposable.UseMutationOpt
   return VueApolloComposable.useMutation<GameStartMutation, GameStartMutationVariables>(GameStartDocument, options);
 }
 export type GameStartMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GameStartMutation, GameStartMutationVariables>;
+export const UserCreateDocument = gql`
+    mutation UserCreate($input: UserCreateInput!) {
+  userCreate(input: $input) {
+    user {
+      ...User
+    }
+  }
+}
+    ${UserFragmentDoc}`;
+
+/**
+ * __useUserCreateMutation__
+ *
+ * To run a mutation, you first call `useUserCreateMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUserCreateMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUserCreateMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserCreateMutation(options: VueApolloComposable.UseMutationOptions<UserCreateMutation, UserCreateMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UserCreateMutation, UserCreateMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UserCreateMutation, UserCreateMutationVariables>(UserCreateDocument, options);
+}
+export type UserCreateMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UserCreateMutation, UserCreateMutationVariables>;
 export const GetGameDocument = gql`
     query GetGame($gameCode: String!) {
   game(gameCode: $gameCode) {

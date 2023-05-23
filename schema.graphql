@@ -166,6 +166,9 @@ type Mutation {
   """game gets created instantly (and if eMail then invited)"""
   gameStart(input: GameStartInput!): GameStartPayload
 
+  """game gets created instantly (and if eMail then invited)"""
+  userCreate(input: UserCreateInput!): UserCreatePayload
+
   """employee gets created instantly (and if eMail then invited)"""
   vote(input: VoteInput!): VotePayload
 }
@@ -237,6 +240,14 @@ type User {
 input UserCreateInput {
   avatar: String
   name: String!
+}
+
+input UserCreateMutationInput {
+  user: UserCreateInput!
+}
+
+type UserCreatePayload {
+  user: User!
 }
 
 input UserUpdateInput {

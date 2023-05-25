@@ -185,34 +185,16 @@ type Query {
 }
 
 enum SVCModel {
-  PARTYNEXTDOOR
-  XXXTENTACION
-  andersonPaak
-  asapRocky
-  beyonce
-  black
   camila
   carti
-  childishGambino
   drake
   earlSweatshirt
-  eminem
   frankOcean
-  gambino
-  juiceHigh
+  juice
   kanye
   kendrick
-  kidCudi
-  lilBaby
-  lilNasX
-  lilUziVert
-  michaelJackson
   nickyMinaj
-  oliviaRodriguez
-  quavo
   sza
-  taylorSwift
-  trippieRed
   weeknd
   youngThug
 }

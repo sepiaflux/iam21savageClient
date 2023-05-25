@@ -1873,42 +1873,6 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "PARTYNEXTDOOR",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "XXXTENTACION",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "andersonPaak",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "asapRocky",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "beyonce",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "black",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "camila",
             "description": null,
             "isDeprecated": false,
@@ -1916,12 +1880,6 @@
           },
           {
             "name": "carti",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "childishGambino",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -1939,25 +1897,13 @@
             "deprecationReason": null
           },
           {
-            "name": "eminem",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "frankOcean",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "gambino",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "juiceHigh",
+            "name": "juice",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -1975,67 +1921,13 @@
             "deprecationReason": null
           },
           {
-            "name": "kidCudi",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "lilBaby",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "lilNasX",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "lilUziVert",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "michaelJackson",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "nickyMinaj",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "oliviaRodriguez",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "quavo",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "sza",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "taylorSwift",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "trippieRed",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

@@ -71,7 +71,7 @@ const gameCode = route.params.gameCode as string
 const queryPolling = ref(true)
 const { result: viewerResult, loading, error } = useGetViewerQuery()
 const { result: gameResult } = useGetGameQuery({ gameCode }, () => ({
-  pollInterval: queryPolling.value ? 1000 : 30000
+  pollInterval: queryPolling.value ? 1000 : 120000
 }))
 
 const battles = computed(() => {

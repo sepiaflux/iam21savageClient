@@ -43,9 +43,13 @@
 </template>
 
 <script lang="ts" setup>
-import { useGetGameLazyQuery } from '~~/graphql/generated/graphql'
+import { useGetGameLazyQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
 
 resetState()
+
+// get viewer and check if exist in DB
+const viewerId = useViewerId()
+
 const chosenGameCode = useGameCode()
 const chosenGameOptions = ref({
   gameCode: chosenGameCode.value || 'placeholder'
@@ -60,6 +64,15 @@ watch(chosenGameCode, (val) => {
   if (val !== undefined) {
     chosenGameOptions.value.gameCode = val
     loadChosenGame()
+  }
+})
+
+const { error } = useGetViewerQuery()
+
+watch(error, () => {
+  if (error) {
+    localStorage.removeItem('viewerId')
+    navigateTo({ name: 'register' })
   }
 })
 const _chosenGame = computed(() => chosenGameResult.value?.game || undefined)

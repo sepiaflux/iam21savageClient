@@ -62,7 +62,7 @@ watch(result, (newValue) => {
   if (newValue && newValue.game) {
     gameCode.value = newValue.game.gameCode || 'GameCode Fehler'
     // Filter out users with isHost set to true
-    users.value = newValue.game.users.filter(user => !user.isHost) || []
+    users.value = (newValue.game.gameUserLink.filter(gameUserLink => !gameUserLink.user.isHost) || []).map(gameUserLink => gameUserLink.user)
     gameState.value = newValue.game.state
 
     if (gameState.value === GameState.Prompt) {
@@ -94,8 +94,8 @@ function startGame () {
   )
     .then((res) => {
       res?.data?.gameStart?.battles?.forEach((battle) => {
-        battle.battleParticipants.forEach((battleParticipant) => {
-          if (battleParticipant.participant.id === viewerId.value) {
+        battle.battleParticipations.forEach((battleParticipation) => {
+          if (battleParticipation.participant.id === viewerId.value) {
             localStorage.setItem('battleId', battle.id)
             navigateTo({ name: 'game-gameCode-battleFirstSubmit', params: { gameCode: gameCodeStorage.value } })
           }

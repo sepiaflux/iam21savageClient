@@ -1,12 +1,23 @@
+enum Adlib {
+  datway
+  drip
+  itsLit
+  splash
+  straightUp
+  twentyone
+  wuh
+  yuh
+}
+
 type Battle {
-  battleParticipants: [BattleParticipant!]!
+  battleParticipations: [BattleParticipation!]!
   game: Game!
   id: ID!
   roundIndex: Int!
 }
 
 input BattleCreateInput {
-  battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
+  battleParticipationsCreateInput: [BattleParticipationCreateInput!]!
   gameCode: ID!
   roundIndex: Int!
 }
@@ -16,14 +27,13 @@ input BattleFirstSubmitInput {
   attribute2: String!
   attribute3: String!
   battleId: ID!
-  deviceId: String!
 }
 
 type BattleFirstSubmitPayload {
-  battleParticipant: BattleParticipant!
+  battleParticipation: BattleParticipation!
 }
 
-type BattleParticipant {
+type BattleParticipation {
   attribute1: String
   attribute2: String
   attribute3: String
@@ -39,7 +49,7 @@ type BattleParticipant {
   votes: [Vote!]!
 }
 
-input BattleParticipantCreateInput {
+input BattleParticipationCreateInput {
   attribute1: String
   attribute2: String
   attribute3: String
@@ -50,7 +60,7 @@ input BattleParticipantCreateInput {
   userMiddlePart: String
 }
 
-input BattleParticipantUpdateInput {
+input BattleParticipationUpdateInput {
   attribute1: String
   attribute2: String
   attribute3: String
@@ -72,7 +82,7 @@ type BattleSubmitPayload {
 }
 
 input BattleUpdateInput {
-  battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
+  battleParticipationsCreateInput: [BattleParticipationCreateInput!]!
   gameCode: ID!
   roundIndex: Int!
 }
@@ -91,11 +101,11 @@ scalar DateTime
 type Game {
   battles: [Battle!]!
   gameCode: String!
+  gameUserLink: [GameUserLink!]!
   id: ID!
   numberOfRounds: Int!
   roundIndex: Int!
   state: GameState!
-  users: [User!]!
 }
 
 input GameCreateInput {
@@ -103,16 +113,18 @@ input GameCreateInput {
 }
 
 type GameCreatePayload {
-  user: User!
+  gameUserLink: GameUserLink!
+  token: String
 }
 
 input GameJoinInput {
   gameCode: ID!
-  user: UserCreateInput!
+  name: String!
 }
 
 type GameJoinPayload {
-  user: User!
+  gameUserLink: GameUserLink!
+  token: String
 }
 
 input GameStartInput {
@@ -133,21 +145,29 @@ enum GameState {
   WaitingToJoin
 }
 
+type GameUserLink {
+  SVCModel: SVCModel!
+  adlibs: [Adlib!]!
+  game: Game!
+  id: ID!
+  isHost: Boolean!
+  user: User!
+}
+
 type Mutation {
   battleFirstSubmit(input: BattleFirstSubmitInput!): BattleFirstSubmitPayload
   battleSubmit(input: BattleSubmitInput!): BattleSubmitPayload
 
   """game gets created instantly (and if eMail then invited)"""
   connectToCloudFunc: ConnectToCloudFuncPayload
-
-  """game gets created instantly (and if eMail then invited)"""
-  gameCreate(input: GameCreateInput!): GameCreatePayload
-
-  """game gets created instantly (and if eMail then invited)"""
+  gameCreate: GameCreatePayload
   gameJoin(input: GameJoinInput!): GameJoinPayload
 
   """game gets created instantly (and if eMail then invited)"""
   gameStart(input: GameStartInput!): GameStartPayload
+
+  """game gets created instantly (and if eMail then invited)"""
+  userCreate(input: UserCreateMutationInput!): UserCreatePayload
 
   """employee gets created instantly (and if eMail then invited)"""
   vote(input: VoteInput!): VotePayload
@@ -164,16 +184,34 @@ type Query {
   viewer: User
 }
 
+enum SVCModel {
+  camila
+  carti
+  drake
+  earlSweatshirt
+  frankOcean
+  juice
+  kanye
+  kendrick
+  nickyMinaj
+  sza
+  weeknd
+  youngThug
+}
+
+type Subscription {
+  """code NOT id"""
+  game(gameCode: String!): Game
+}
+
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
 type User {
   avatar: String
-  battlesWhereParticipant: [BattleParticipant!]!
-  deviceId: String!
-  game: Game!
+  battlesWhereParticipant: [BattleParticipation!]!
+  gameUserLink: [GameUserLink!]!
   id: ID!
-  isHost: Boolean!
   name: String!
   score: Int!
 }
@@ -182,6 +220,14 @@ type User {
 input UserCreateInput {
   avatar: String
   name: String!
+}
+
+input UserCreateMutationInput {
+  user: UserCreateInput!
+}
+
+type UserCreatePayload {
+  user: User!
 }
 
 input UserUpdateInput {
@@ -193,7 +239,7 @@ input UserUpdateInput {
 }
 
 type Vote {
-  battleParticipant: BattleParticipant!
+  battleParticipation: BattleParticipation!
   id: ID!
   votee: User!
   voter: User!
@@ -206,12 +252,12 @@ input VoteCreateInput {
 }
 
 input VoteInput {
-  battleParticipantId: ID!
+  battleParticipationId: ID!
   voterId: ID!
 }
 
 type VotePayload {
-  battleParticipant: BattleParticipant!
+  battleParticipation: BattleParticipation!
 }
 
 input VoteUpdateInput {

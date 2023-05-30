@@ -3,14 +3,27 @@ fragment User on User {
   name
   score
   avatar
-  deviceId
+}
+
+fragment GameUserLink on GameUserLink {
+  id
+  user {
+    ...User
+  }
+  game {
+    ...Game
+  }
   isHost
+  SVCModel
+  adlibs
 }
 
 fragment FullUser on User {
   ...User
-  game {
+  gameUserLink {
+    game {
     ...Game
+    }
   }
 }
 
@@ -32,7 +45,7 @@ fragment vote on Vote {
   }
 }
 
-fragment BattleParticipant on BattleParticipant {
+fragment BattleParticipation on BattleParticipation {
   id
   attribute1
   attribute2
@@ -54,8 +67,8 @@ fragment Battle on Battle {
   game {
     ...Game
   }
-  battleParticipants {
-    ...BattleParticipant
+  battleParticipations {
+    ...BattleParticipation
   }
   roundIndex
 }

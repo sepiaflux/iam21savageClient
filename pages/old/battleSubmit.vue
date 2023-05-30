@@ -61,12 +61,12 @@ const { mutate: submitFirstBattleMutation } = useBattleSubmitMutation()
 
 const openAIFirstPart = computed(() => {
   // eslint-disable-next-line no-console
-  console.log('battleParticipants', resultBattleViewerQuery.value?.battleViewer?.battleParticipants)
-  const { battleParticipants } = resultBattleViewerQuery.value?.battleViewer || {}
-  if (battleParticipants) {
-    const battleParticipant = battleParticipants.find(bp => bp.participant.id === viewerId.value)
-    if (battleParticipant) {
-      return battleParticipant.openAIFirstPart
+  console.log('battleParticipations', resultBattleViewerQuery.value?.battleViewer?.battleParticipations)
+  const { battleParticipations } = resultBattleViewerQuery.value?.battleViewer || {}
+  if (battleParticipations) {
+    const battleParticipation = battleParticipations.find(bp => bp.participant.id === viewerId.value)
+    if (battleParticipation) {
+      return battleParticipation.openAIFirstPart
     }
   }
 })
@@ -78,7 +78,7 @@ watch(result, (newValue) => {
 
 watch(resultBattleViewerQuery, (newValue) => {
   if (newValue && newValue.battleViewer) {
-    users.value = newValue.battleViewer.battleParticipants.map(participant => participant.participant)
+    users.value = newValue.battleViewer.battleParticipations.map(participant => participant.participant)
   }
 }, { immediate: true })
 

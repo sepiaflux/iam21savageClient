@@ -1,7 +1,7 @@
 mutation BattleFirstSubmit($input: BattleFirstSubmitInput!) {
   battleFirstSubmit(input: $input) {
-    battleParticipant {
-      ...BattleParticipant
+    battleParticipation {
+      ...BattleParticipation
     }
   }
 }
@@ -16,25 +16,27 @@ mutation BattleSubmit($input: BattleSubmitInput!) {
 
 mutation Vote($input: VoteInput!) {
   vote(input: $input) {
-    battleParticipant {
-      ...BattleParticipant
+    battleParticipation {
+      ...BattleParticipation
     }
   }
 }
 
-mutation GameCreate($input: GameCreateInput!) {
-  gameCreate(input: $input) {
-    user {
-      ...FullUser
+mutation GameCreate {
+  gameCreate {
+    gameUserLink {
+      ...GameUserLink
     }
+    token
   }
 }
 
 mutation GameJoin($input: GameJoinInput!) {
   gameJoin(input: $input) {
-    user {
-      ...FullUser
+    gameUserLink {
+      ...GameUserLink
     }
+    token
   }
 }
 
@@ -45,6 +47,14 @@ mutation GameStart($input: GameStartInput!) {
     }
     battles {
       ...Battle
+    }
+  }
+}
+
+mutation UserCreate($input: UserCreateMutationInput!) {
+  userCreate(input: $input) {
+    user {
+      ...User
     }
   }
 }

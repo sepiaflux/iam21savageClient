@@ -30,8 +30,8 @@
 import { useGameStartMutation, useGetGameQuery } from '~~/graphql/generated/graphql'
 
 const { gameCode } = defineProps<{
-              gameCode: string,
-              }>()
+                gameCode: string,
+                }>()
 
 const { result, loading: gameLoading } = useGetGameQuery({ gameCode }, { pollInterval: 1500 })
 const { mutate: startGameMutate, loading: startGameLoading } = useGameStartMutation()

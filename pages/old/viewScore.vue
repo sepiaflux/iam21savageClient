@@ -10,9 +10,9 @@
             <h3 class="mx-auto max-w-xl text-lg leading-8 text-gray-300">
               Battle {{ index + 1 }}
             </h3>
-            <div v-for="(battleParticipant, battleParticipantIndex) in battle.battleParticipants" :key="battleParticipantIndex">
+            <div v-for="(battleParticipation, battleParticipationIndex) in battle.battleParticipations" :key="battleParticipationIndex">
               <p class="mx-auto max-w-xl text-lg leading-8 text-gray-300">
-                Player {{ battleParticipantIndex }} - Score: {{ battleParticipant.participant.score * 1000 }}
+                Player {{ battleParticipationIndex }} - Score: {{ battleParticipation.participant.score * 1000 }}
               </p>
             </div>
           </div>

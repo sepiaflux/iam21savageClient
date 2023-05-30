@@ -21,11 +21,10 @@ const retryLink = new RetryLink({
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
   const token = localStorage.getItem('userToken')
-  const viewerId = useViewerId()
   return {
     headers: {
       ...headers,
-      authorization: token ? `${token}` : viewerId.value ? `${viewerId.value}` : ''
+      authorization: token || ''
     }
   }
 })

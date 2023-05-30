@@ -21,34 +21,34 @@
             <h3 class="text-lg text-gray-300">
               Battle {{ index + 1 }}
             </h3>
-            <div v-for="(battleParticipant, battleParticipantIndex) in battle.battleParticipants" :key="battleParticipantIndex">
+            <div v-for="(battleParticipation, battleParticipationIndex) in battle.battleParticipations" :key="battleParticipationIndex">
               <template v-if="isHost">
                 <h4 class="text-lg text-gray-300">
                   Rap Text - First Player:
                 </h4>
-                <p v-if="battleParticipant.rapText" class="mt-4 text-lg text-gray-300">
-                  {{ battleParticipant.rapText }}
+                <p v-if="battleParticipation.rapText" class="mt-4 text-lg text-gray-300">
+                  {{ battleParticipation.rapText }}
                 </p>
                 <p v-else class="mt-4 text-lg text-gray-300">
-                  No rap text available for player {{ battleParticipantIndex }}.
+                  No rap text available for player {{ battleParticipationIndex }}.
                 </p>
                 <h4 class="mt-10 text-lg text-gray-300">
-                  Audio - Player {{ battleParticipantIndex }}:
+                  Audio - Player {{ battleParticipationIndex }}:
                 </h4>
                 <audio
-                  v-if="battleParticipant.audioURL"
-                  :key="battleParticipant.audioURL"
+                  v-if="battleParticipation.audioURL"
+                  :key="battleParticipation.audioURL"
                   class="mt-4"
                   controls
-                  :src="battleParticipant.audioURL"
+                  :src="battleParticipation.audioURL"
                 >Your browser does not support the audio element.</audio>
                 <p v-else class="mt-4 text-lg text-gray-300">
-                  No audio available for player {{ battleParticipantIndex }}.
+                  No audio available for player {{ battleParticipationIndex }}.
                 </p>
               </template>
               <template v-else>
-                <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="vote(battleParticipant.id)">
-                  Vote for {{ battleParticipant.participant.name }}
+                <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="vote(battleParticipation.id)">
+                  Vote for {{ battleParticipation.participant.name }}
                 </button>
               </template>
             </div>
@@ -85,21 +85,21 @@ watch(battles, (val) => {
 
     // Iterate through the battles
     for (const battle of val) {
-      // Check if all battleParticipants have an audioURL
-      for (const participant of battle.battleParticipants) {
+      // Check if all battleParticipations have an audioURL
+      for (const participant of battle.battleParticipations) {
         if (!participant.audioURL) {
           allHaveAudioURL = false
           break
         }
       }
 
-      // If any battleParticipant doesn't have an audioURL, stop checking further
+      // If any battleParticipation doesn't have an audioURL, stop checking further
       if (!allHaveAudioURL) {
         break
       }
     }
 
-    // If all battleParticipants of all battles have an audioURL, stop polling
+    // If all battleParticipations of all battles have an audioURL, stop polling
     if (allHaveAudioURL) {
       queryPolling.value = false
     }
@@ -114,7 +114,7 @@ watch(viewerResult, (newValue) => {
 
 const { mutate: voteMutate } = useVoteMutation()
 
-async function vote (battleParticipantId: string) {
+async function vote (battleParticipationId: string) {
   if (!viewerResult.value?.viewer?.id) {
     // eslint-disable-next-line no-console
     console.error('No viewer ID available.')
@@ -124,7 +124,7 @@ async function vote (battleParticipantId: string) {
   try {
     await voteMutate({
       input: {
-        battleParticipantId,
+        battleParticipationId,
         voterId: viewerResult.value.viewer.id
       }
     })

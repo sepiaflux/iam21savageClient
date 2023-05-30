@@ -17,21 +17,23 @@ if (!gameCode || gameCode.length !== 4) {
   navigateTo({ name: 'index' })
 }
 localStorage.setItem('gameCode', gameCode)
-const viewerId = localStorage.getItem('viewerId')
-if (!viewerId) {
+const token = localStorage.getItem('userToken')
+if (!token) {
   localStorage.removeItem('gameCode')
   navigateTo({ name: 'index' })
 }
 
-const { loading: gameLoading, error: gameError } = useGetGameQuery({ gameCode })
+const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameCode })
 const { result: viewerResult, loading: viewerLoading, error: viewerError } = useGetViewerQuery()
 
-const isHost = computed(() => viewerResult.value?.viewer?.isHost)
+const viewer = computed(() => viewerResult.value?.viewer)
+const isHost = computed(() => gameResult.value?.game?.gameUserLink.find(x => x.user.id === viewer.value?.id)?.isHost || false)
 
 watch(gameError, (val) => {
   if (val) {
     // TODO: Popup that handles error
     localStorage.removeItem('gameCode')
+    alert(val)
     navigateTo({ name: 'index' })
   }
 })
@@ -40,6 +42,7 @@ watch(viewerError, (val) => {
     // TODO: Handle viewer error
     localStorage.removeItem('gameCode')
     alert(val)
+    navigateTo({ name: 'index' })
   }
 })
 const loading = computed(() => gameLoading.value || viewerLoading.value)

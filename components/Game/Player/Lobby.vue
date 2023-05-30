@@ -7,6 +7,7 @@
       <div v-for="player in players?.filter(x => x.name !== 'Host')" :key="player.id">
         {{ player.name }}
       </div>
+      <LoadingPinger v-if="loading" />
     </div>
     <div v-else>
       Noch keine Spieler.
@@ -21,7 +22,8 @@ const { gameCode } = defineProps<{
               gameCode: string,
               }>()
 
-const { result, loading, error } = useGetGameQuery({ gameCode }, { pollInterval: 1500 })
-const players = computed(() => result.value?.game?.users)
-const gameState = computed(() => result.value?.game?.state)
+const { result, loading: gameLoading } = useGetGameQuery({ gameCode }, { pollInterval: 1500 })
+const loading = computed(() => gameLoading.value)
+
+const players = computed(() => result.value?.game?.gameUserLink.map(x => x.user))
 </script>

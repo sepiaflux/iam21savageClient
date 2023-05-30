@@ -118,7 +118,7 @@ watch(result, (newValue) => {
 
 watch(resultBattleViewerQuery, (newValue) => {
   if (newValue && newValue.battleViewer) {
-    users.value = newValue.battleViewer.battleParticipants.map(participant => participant.participant)
+    users.value = newValue.battleViewer.battleParticipations.map(participant => participant.participant)
   }
 }, { immediate: true })
 
@@ -136,7 +136,7 @@ watch(resultGetGameQuery, (newValue) => {
 async function submitBattle () {
   isLoading.value = true
   try {
-    const battleParticipant = await submitFirstBattleMutation({
+    const battleParticipation = await submitFirstBattleMutation({
       input: {
         battleId,
         attribute1: attribute1.value,
@@ -146,7 +146,7 @@ async function submitBattle () {
       }
     })
 
-    if (battleParticipant?.data && battleParticipant.data.battleFirstSubmit) {
+    if (battleParticipation?.data && battleParticipation.data.battleFirstSubmit) {
       navigateTo({ name: 'game-gameCode-battleSubmit', params: { gameCode } })
     }
   } catch (error) {

@@ -1,14 +1,14 @@
 <!-- eslint-disable no-console -->
 <template>
   <div>
-    <LoadingPinger v-if="loading || gameError || viewerError" />
+    <LoadingPinger v-if="loading || gameUserLinkError" />
     <GameHost v-else-if="isHost" :game-code="gameCode" />
     <GamePlayer v-else :game-code="gameCode" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useGetGameQuery, useGetViewerQuery } from '~~/graphql/generated/graphql'
+import { useGameUserLinkInfoByCodeQuery } from '~~/graphql/generated/graphql'
 
 const route = useRoute()
 const gameCode = route.params.gameCode as string
@@ -23,13 +23,12 @@ if (!token) {
   navigateTo({ name: 'index' })
 }
 
-const { result: gameResult, loading: gameLoading, error: gameError } = useGetGameQuery({ gameCode })
-const { result: viewerResult, loading: viewerLoading, error: viewerError } = useGetViewerQuery()
+const { result: gameUserLinkResult, loading: gameUserLinkLoading, error: gameUserLinkError } = useGameUserLinkInfoByCodeQuery({ gameCode })
 
-const viewer = computed(() => viewerResult.value?.viewer)
-const isHost = computed(() => gameResult.value?.game?.gameUserLink.find(x => x.user.id === viewer.value?.id)?.isHost || false)
+const gameUserLink = computed(() => gameUserLinkResult.value?.gameUserLinkByCode)
+const isHost = computed(() => gameUserLink.value?.isHost)
 
-watch(gameError, (val) => {
+watch(gameUserLinkError, (val) => {
   if (val) {
     // TODO: Popup that handles error
     localStorage.removeItem('gameCode')
@@ -37,14 +36,7 @@ watch(gameError, (val) => {
     navigateTo({ name: 'index' })
   }
 })
-watch(viewerError, (val) => {
-  if (val) {
-    // TODO: Handle viewer error
-    localStorage.removeItem('gameCode')
-    alert(val)
-    navigateTo({ name: 'index' })
-  }
-})
-const loading = computed(() => gameLoading.value || viewerLoading.value)
+
+const loading = computed(() => gameUserLinkLoading.value)
 
 </script>

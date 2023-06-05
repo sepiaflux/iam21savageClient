@@ -16,14 +16,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useGetGameQuery } from '~~/graphql/generated/graphql'
+import { useGamePlayersQuery } from '~~/graphql/generated/graphql'
 
 const { gameCode } = defineProps<{
               gameCode: string,
               }>()
 
-const { result, loading: gameLoading } = useGetGameQuery({ gameCode }, { pollInterval: 1500 })
+const { result, loading: gameLoading } = useGamePlayersQuery({ gameCode }, { pollInterval: 1500 })
 const loading = computed(() => gameLoading.value)
 
-const players = computed(() => result.value?.game?.gameUserLink.map(x => x.user))
+const players = computed(() => result.value?.game?.gameUserLinks.map(x => x.user))
 </script>

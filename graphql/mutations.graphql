@@ -1,60 +1,26 @@
-mutation BattleFirstSubmit($input: BattleFirstSubmitInput!) {
-  battleFirstSubmit(input: $input) {
-    battleParticipation {
-      ...BattleParticipation
-    }
-  }
-}
-
-mutation BattleSubmit($input: BattleSubmitInput!) {
-  battleSubmit(input: $input) {
-    battle {
-      ...Battle
-    }
-  }
-}
-
-mutation Vote($input: VoteInput!) {
-  vote(input: $input) {
-    battleParticipation {
-      ...BattleParticipation
-    }
-  }
-}
-
-mutation GameCreate {
+mutation gameCreate {
   gameCreate {
     gameUserLink {
-      ...GameUserLink
+      ...GameUserLinkInfo
     }
     token
   }
 }
 
-mutation GameJoin($input: GameJoinInput!) {
+mutation gameJoin($input: GameJoinInput!) {
   gameJoin(input: $input) {
     gameUserLink {
-      ...GameUserLink
+      ...GameUserLinkInfo
     }
     token
   }
 }
 
-mutation GameStart($input: GameStartInput!) {
+mutation gameStart($input: GameStartInput!) {
   gameStart(input: $input) {
     game {
-      ...Game
-    }
-    battles {
-      ...Battle
+      ...GameInfo
     }
   }
 }
 
-mutation UserCreate($input: UserCreateMutationInput!) {
-  userCreate(input: $input) {
-    user {
-      ...User
-    }
-  }
-}

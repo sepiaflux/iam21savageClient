@@ -1,74 +1,19 @@
-fragment User on User {
-  id
-  name
-  score
-  avatar
-}
-
-fragment GameUserLink on GameUserLink {
-  id
-  user {
-    ...User
-  }
-  game {
-    ...Game
-  }
-  isHost
-  SVCModel
-  adlibs
-}
-
-fragment FullUser on User {
-  ...User
-  gameUserLink {
-    game {
-    ...Game
-    }
-  }
-}
-
-fragment Game on Game {
+fragment GameInfo on Game {
   id
   gameCode
-  numberOfRounds
-  roundIndex
   state
 }
 
-fragment vote on Vote {
+fragment GameUserLinkInfo on GameUserLink {
   id
-  votee {
-    ...User
-  }
-  voter {
-    ...User
-  }
-}
-
-fragment BattleParticipation on BattleParticipation {
-  id
-  attribute1
-  attribute2
-  attribute3
-  openAIFirstPart
-  userMiddlePart
-  rapText
-  audioURL
-  participant {
-    ...User
-  }
-  votes {
-    ...vote
-  }
-}
-
-fragment Battle on Battle {
-  id
+  isHost
   game {
-    ...Game
+    ...GameInfo
   }
-  battleParticipations {
-    ...BattleParticipation
+  user {
+    id
+    name
   }
-  roundIndex
+  SVCModel
+  adlibs
 }

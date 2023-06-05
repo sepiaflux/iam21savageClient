@@ -32,10 +32,10 @@ export enum Adlib {
 
 export type Battle = {
   __typename?: 'Battle';
-  battleParticipations: Array<BattleParticipation>;
-  game: Game;
+  gameRound: GameRound;
   id: Scalars['ID'];
-  roundIndex: Scalars['Int'];
+  participations: Array<BattleParticipation>;
+  votes: Array<Vote>;
 };
 
 export type BattleCreateInput = {
@@ -44,29 +44,14 @@ export type BattleCreateInput = {
   roundIndex: Scalars['Int'];
 };
 
-export type BattleFirstSubmitInput = {
-  attribute1: Scalars['String'];
-  attribute2: Scalars['String'];
-  attribute3: Scalars['String'];
-  battleId: Scalars['ID'];
-};
-
-export type BattleFirstSubmitPayload = {
-  __typename?: 'BattleFirstSubmitPayload';
-  battleParticipation: BattleParticipation;
-};
-
 export type BattleParticipation = {
   __typename?: 'BattleParticipation';
-  attribute1?: Maybe<Scalars['String']>;
-  attribute2?: Maybe<Scalars['String']>;
-  attribute3?: Maybe<Scalars['String']>;
   /** we use a service for this so this is the link to that service */
   audioURL?: Maybe<Scalars['String']>;
   battle: Battle;
   id: Scalars['ID'];
   openAIFirstPart?: Maybe<Scalars['String']>;
-  participant: User;
+  participant: GameUserLink;
   rapText?: Maybe<Scalars['String']>;
   userMiddlePart?: Maybe<Scalars['String']>;
   votes: Array<Vote>;
@@ -96,7 +81,6 @@ export type BattleParticipationUpdateInput = {
 
 export type BattleSubmitInput = {
   battleId: Scalars['ID'];
-  deviceId: Scalars['String'];
   middlePart: Scalars['String'];
 };
 
@@ -118,12 +102,10 @@ export type ConnectToCloudFuncPayload = {
 
 export type Game = {
   __typename?: 'Game';
-  battles: Array<Battle>;
   gameCode: Scalars['String'];
-  gameUserLink: Array<GameUserLink>;
+  gameRounds: Array<GameRound>;
+  gameUserLinks: Array<GameUserLink>;
   id: Scalars['ID'];
-  numberOfRounds: Scalars['Int'];
-  roundIndex: Scalars['Int'];
   state: GameState;
 };
 
@@ -148,17 +130,25 @@ export type GameJoinPayload = {
   token?: Maybe<Scalars['String']>;
 };
 
+export type GameRound = {
+  __typename?: 'GameRound';
+  battles: Array<Battle>;
+  game: Game;
+  id: Scalars['ID'];
+};
+
 export type GameStartInput = {
   gameCode: Scalars['ID'];
+  numberOfRounds: Scalars['Int'];
 };
 
 export type GameStartPayload = {
   __typename?: 'GameStartPayload';
-  battles: Array<Battle>;
   game: Game;
 };
 
 export enum GameState {
+  Attributes = 'Attributes',
   Battle = 'Battle',
   FinalScreen = 'FinalScreen',
   Prompt = 'Prompt',
@@ -177,25 +167,39 @@ export type GameUserLink = {
   user: User;
 };
 
+export type GivenAttribute = {
+  __typename?: 'GivenAttribute';
+  attribute?: Maybe<Scalars['String']>;
+  author: GameUserLink;
+  game: Game;
+  id: Scalars['ID'];
+  target: GameUserLink;
+};
+
+export type GivenAttributeSubmitInput = {
+  attribute: Scalars['String'];
+  givenAttributeId: Scalars['ID'];
+};
+
+export type GivenAttributeSubmitPayload = {
+  __typename?: 'GivenAttributeSubmitPayload';
+  givenAttribute: GivenAttribute;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
-  battleFirstSubmit?: Maybe<BattleFirstSubmitPayload>;
   battleSubmit?: Maybe<BattleSubmitPayload>;
   /** game gets created instantly (and if eMail then invited) */
   connectToCloudFunc?: Maybe<ConnectToCloudFuncPayload>;
   gameCreate?: Maybe<GameCreatePayload>;
   gameJoin?: Maybe<GameJoinPayload>;
-  /** game gets created instantly (and if eMail then invited) */
+  /** start the game */
   gameStart?: Maybe<GameStartPayload>;
+  givenAttributeSubmit?: Maybe<GivenAttributeSubmitPayload>;
   /** game gets created instantly (and if eMail then invited) */
   userCreate?: Maybe<UserCreatePayload>;
   /** employee gets created instantly (and if eMail then invited) */
   vote?: Maybe<VotePayload>;
-};
-
-
-export type MutationBattleFirstSubmitArgs = {
-  input: BattleFirstSubmitInput;
 };
 
 
@@ -211,6 +215,11 @@ export type MutationGameJoinArgs = {
 
 export type MutationGameStartArgs = {
   input: GameStartInput;
+};
+
+
+export type MutationGivenAttributeSubmitArgs = {
+  input: GivenAttributeSubmitInput;
 };
 
 
@@ -230,6 +239,7 @@ export type Query = {
   battles: Array<Battle>;
   /** code NOT id */
   game?: Maybe<Game>;
+  gameUserLinkByCode?: Maybe<GameUserLink>;
   user?: Maybe<User>;
   viewer?: Maybe<User>;
 };
@@ -246,6 +256,11 @@ export type QueryBattleViewerArgs = {
 
 
 export type QueryGameArgs = {
+  gameCode: Scalars['String'];
+};
+
+
+export type QueryGameUserLinkByCodeArgs = {
   gameCode: Scalars['String'];
 };
 
@@ -284,10 +299,9 @@ export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
   battlesWhereParticipant: Array<BattleParticipation>;
-  gameUserLink: Array<GameUserLink>;
+  gameUserLinks: Array<GameUserLink>;
   id: Scalars['ID'];
   name: Scalars['String'];
-  score: Scalars['Int'];
 };
 
 /** User already exists and gets invited */
@@ -343,294 +357,82 @@ export type VoteUpdateInput = {
   voterId?: InputMaybe<Scalars['ID']>;
 };
 
-export type UserFragment = { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null };
+export type GameInfoFragment = { __typename?: 'Game', id: string, gameCode: string, state: GameState };
 
-export type GameUserLinkFragment = { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } };
-
-export type FullUserFragment = { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null, gameUserLink: Array<{ __typename?: 'GameUserLink', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } }> };
-
-export type GameFragment = { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState };
-
-export type VoteFragment = { __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } };
-
-export type BattleParticipationFragment = { __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> };
-
-export type BattleFragment = { __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> }> };
-
-export type BattleFirstSubmitMutationVariables = Exact<{
-  input: BattleFirstSubmitInput;
-}>;
-
-
-export type BattleFirstSubmitMutation = { __typename?: 'Mutation', battleFirstSubmit?: { __typename?: 'BattleFirstSubmitPayload', battleParticipation: { __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> } } | null };
-
-export type BattleSubmitMutationVariables = Exact<{
-  input: BattleSubmitInput;
-}>;
-
-
-export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> }> } } | null };
-
-export type VoteMutationVariables = Exact<{
-  input: VoteInput;
-}>;
-
-
-export type VoteMutation = { __typename?: 'Mutation', vote?: { __typename?: 'VotePayload', battleParticipation: { __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> } } | null };
+export type GameUserLinkInfoFragment = { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } };
 
 export type GameCreateMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GameCreateMutation = { __typename?: 'Mutation', gameCreate?: { __typename?: 'GameCreatePayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
+export type GameCreateMutation = { __typename?: 'Mutation', gameCreate?: { __typename?: 'GameCreatePayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } } } | null };
 
 export type GameJoinMutationVariables = Exact<{
   input: GameJoinInput;
 }>;
 
 
-export type GameJoinMutation = { __typename?: 'Mutation', gameJoin?: { __typename?: 'GameJoinPayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState } } } | null };
+export type GameJoinMutation = { __typename?: 'Mutation', gameJoin?: { __typename?: 'GameJoinPayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } } } | null };
 
 export type GameStartMutationVariables = Exact<{
   input: GameStartInput;
 }>;
 
 
-export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> }> }> } | null };
+export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, state: GameState } } | null };
 
-export type UserCreateMutationVariables = Exact<{
-  input: UserCreateMutationInput;
-}>;
-
-
-export type UserCreateMutation = { __typename?: 'Mutation', userCreate?: { __typename?: 'UserCreatePayload', user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } } | null };
-
-export type GetGameQueryVariables = Exact<{
+export type GameInfoQueryVariables = Exact<{
   gameCode: Scalars['String'];
 }>;
 
 
-export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState, gameUserLink: Array<{ __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, user: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }>, battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> }> }> } | null };
+export type GameInfoQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, state: GameState } | null };
 
-export type GetUserQueryVariables = Exact<{
-  id: Scalars['ID'];
+export type GamePlayersQueryVariables = Exact<{
+  gameCode: Scalars['String'];
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } | null };
+export type GamePlayersQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, state: GameState, gameUserLinks: Array<{ __typename?: 'GameUserLink', id: string, SVCModel: SvcModel, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } }> } | null };
 
-export type GetBattleQueryVariables = Exact<{
-  id: Scalars['ID'];
+export type GameUserLinkInfoByCodeQueryVariables = Exact<{
+  gameCode: Scalars['String'];
 }>;
 
 
-export type GetBattleQuery = { __typename?: 'Query', battle?: { __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> }> } | null };
+export type GameUserLinkInfoByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } } | null };
 
-export type GetBattlesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetBattlesQuery = { __typename?: 'Query', battles: Array<{ __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> }> }> };
-
-export type GetBattleViewerQueryVariables = Exact<{
-  userId: Scalars['ID'];
-}>;
-
-
-export type GetBattleViewerQuery = { __typename?: 'Query', battleViewer?: { __typename?: 'Battle', id: string, roundIndex: number, game: { __typename?: 'Game', id: string, gameCode: string, numberOfRounds: number, roundIndex: number, state: GameState }, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, attribute1?: string | null, attribute2?: string | null, attribute3?: string | null, openAIFirstPart?: string | null, userMiddlePart?: string | null, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, votes: Array<{ __typename?: 'Vote', id: string, votee: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null }, voter: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } }> }> } | null };
-
-export type GetViewerQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetViewerQuery = { __typename?: 'Query', viewer?: { __typename?: 'User', id: string, name: string, score: number, avatar?: string | null } | null };
-
-export const UserFragmentDoc = gql`
-    fragment User on User {
-  id
-  name
-  score
-  avatar
-}
-    `;
-export const GameFragmentDoc = gql`
-    fragment Game on Game {
+export const GameInfoFragmentDoc = gql`
+    fragment GameInfo on Game {
   id
   gameCode
-  numberOfRounds
-  roundIndex
   state
 }
     `;
-export const GameUserLinkFragmentDoc = gql`
-    fragment GameUserLink on GameUserLink {
+export const GameUserLinkInfoFragmentDoc = gql`
+    fragment GameUserLinkInfo on GameUserLink {
   id
-  user {
-    ...User
-  }
-  game {
-    ...Game
-  }
   isHost
+  game {
+    ...GameInfo
+  }
+  user {
+    id
+    name
+  }
   SVCModel
   adlibs
 }
-    ${UserFragmentDoc}
-${GameFragmentDoc}`;
-export const FullUserFragmentDoc = gql`
-    fragment FullUser on User {
-  ...User
-  gameUserLink {
-    game {
-      ...Game
-    }
-  }
-}
-    ${UserFragmentDoc}
-${GameFragmentDoc}`;
-export const VoteFragmentDoc = gql`
-    fragment vote on Vote {
-  id
-  votee {
-    ...User
-  }
-  voter {
-    ...User
-  }
-}
-    ${UserFragmentDoc}`;
-export const BattleParticipationFragmentDoc = gql`
-    fragment BattleParticipation on BattleParticipation {
-  id
-  attribute1
-  attribute2
-  attribute3
-  openAIFirstPart
-  userMiddlePart
-  rapText
-  audioURL
-  participant {
-    ...User
-  }
-  votes {
-    ...vote
-  }
-}
-    ${UserFragmentDoc}
-${VoteFragmentDoc}`;
-export const BattleFragmentDoc = gql`
-    fragment Battle on Battle {
-  id
-  game {
-    ...Game
-  }
-  battleParticipations {
-    ...BattleParticipation
-  }
-  roundIndex
-}
-    ${GameFragmentDoc}
-${BattleParticipationFragmentDoc}`;
-export const BattleFirstSubmitDocument = gql`
-    mutation BattleFirstSubmit($input: BattleFirstSubmitInput!) {
-  battleFirstSubmit(input: $input) {
-    battleParticipation {
-      ...BattleParticipation
-    }
-  }
-}
-    ${BattleParticipationFragmentDoc}`;
-
-/**
- * __useBattleFirstSubmitMutation__
- *
- * To run a mutation, you first call `useBattleFirstSubmitMutation` within a Vue component and pass it any options that fit your needs.
- * When your component renders, `useBattleFirstSubmitMutation` returns an object that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
- *
- * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
- *
- * @example
- * const { mutate, loading, error, onDone } = useBattleFirstSubmitMutation({
- *   variables: {
- *     input: // value for 'input'
- *   },
- * });
- */
-export function useBattleFirstSubmitMutation(options: VueApolloComposable.UseMutationOptions<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables>> = {}) {
-  return VueApolloComposable.useMutation<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables>(BattleFirstSubmitDocument, options);
-}
-export type BattleFirstSubmitMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<BattleFirstSubmitMutation, BattleFirstSubmitMutationVariables>;
-export const BattleSubmitDocument = gql`
-    mutation BattleSubmit($input: BattleSubmitInput!) {
-  battleSubmit(input: $input) {
-    battle {
-      ...Battle
-    }
-  }
-}
-    ${BattleFragmentDoc}`;
-
-/**
- * __useBattleSubmitMutation__
- *
- * To run a mutation, you first call `useBattleSubmitMutation` within a Vue component and pass it any options that fit your needs.
- * When your component renders, `useBattleSubmitMutation` returns an object that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
- *
- * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
- *
- * @example
- * const { mutate, loading, error, onDone } = useBattleSubmitMutation({
- *   variables: {
- *     input: // value for 'input'
- *   },
- * });
- */
-export function useBattleSubmitMutation(options: VueApolloComposable.UseMutationOptions<BattleSubmitMutation, BattleSubmitMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<BattleSubmitMutation, BattleSubmitMutationVariables>> = {}) {
-  return VueApolloComposable.useMutation<BattleSubmitMutation, BattleSubmitMutationVariables>(BattleSubmitDocument, options);
-}
-export type BattleSubmitMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<BattleSubmitMutation, BattleSubmitMutationVariables>;
-export const VoteDocument = gql`
-    mutation Vote($input: VoteInput!) {
-  vote(input: $input) {
-    battleParticipation {
-      ...BattleParticipation
-    }
-  }
-}
-    ${BattleParticipationFragmentDoc}`;
-
-/**
- * __useVoteMutation__
- *
- * To run a mutation, you first call `useVoteMutation` within a Vue component and pass it any options that fit your needs.
- * When your component renders, `useVoteMutation` returns an object that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
- *
- * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
- *
- * @example
- * const { mutate, loading, error, onDone } = useVoteMutation({
- *   variables: {
- *     input: // value for 'input'
- *   },
- * });
- */
-export function useVoteMutation(options: VueApolloComposable.UseMutationOptions<VoteMutation, VoteMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<VoteMutation, VoteMutationVariables>> = {}) {
-  return VueApolloComposable.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument, options);
-}
-export type VoteMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<VoteMutation, VoteMutationVariables>;
+    ${GameInfoFragmentDoc}`;
 export const GameCreateDocument = gql`
-    mutation GameCreate {
+    mutation gameCreate {
   gameCreate {
     gameUserLink {
-      ...GameUserLink
+      ...GameUserLinkInfo
     }
     token
   }
 }
-    ${GameUserLinkFragmentDoc}`;
+    ${GameUserLinkInfoFragmentDoc}`;
 
 /**
  * __useGameCreateMutation__
@@ -650,15 +452,15 @@ export function useGameCreateMutation(options: VueApolloComposable.UseMutationOp
 }
 export type GameCreateMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GameCreateMutation, GameCreateMutationVariables>;
 export const GameJoinDocument = gql`
-    mutation GameJoin($input: GameJoinInput!) {
+    mutation gameJoin($input: GameJoinInput!) {
   gameJoin(input: $input) {
     gameUserLink {
-      ...GameUserLink
+      ...GameUserLinkInfo
     }
     token
   }
 }
-    ${GameUserLinkFragmentDoc}`;
+    ${GameUserLinkInfoFragmentDoc}`;
 
 /**
  * __useGameJoinMutation__
@@ -682,18 +484,14 @@ export function useGameJoinMutation(options: VueApolloComposable.UseMutationOpti
 }
 export type GameJoinMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GameJoinMutation, GameJoinMutationVariables>;
 export const GameStartDocument = gql`
-    mutation GameStart($input: GameStartInput!) {
+    mutation gameStart($input: GameStartInput!) {
   gameStart(input: $input) {
     game {
-      ...Game
-    }
-    battles {
-      ...Battle
+      ...GameInfo
     }
   }
 }
-    ${GameFragmentDoc}
-${BattleFragmentDoc}`;
+    ${GameInfoFragmentDoc}`;
 
 /**
  * __useGameStartMutation__
@@ -716,223 +514,102 @@ export function useGameStartMutation(options: VueApolloComposable.UseMutationOpt
   return VueApolloComposable.useMutation<GameStartMutation, GameStartMutationVariables>(GameStartDocument, options);
 }
 export type GameStartMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GameStartMutation, GameStartMutationVariables>;
-export const UserCreateDocument = gql`
-    mutation UserCreate($input: UserCreateMutationInput!) {
-  userCreate(input: $input) {
-    user {
-      ...User
-    }
-  }
-}
-    ${UserFragmentDoc}`;
-
-/**
- * __useUserCreateMutation__
- *
- * To run a mutation, you first call `useUserCreateMutation` within a Vue component and pass it any options that fit your needs.
- * When your component renders, `useUserCreateMutation` returns an object that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
- *
- * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
- *
- * @example
- * const { mutate, loading, error, onDone } = useUserCreateMutation({
- *   variables: {
- *     input: // value for 'input'
- *   },
- * });
- */
-export function useUserCreateMutation(options: VueApolloComposable.UseMutationOptions<UserCreateMutation, UserCreateMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UserCreateMutation, UserCreateMutationVariables>> = {}) {
-  return VueApolloComposable.useMutation<UserCreateMutation, UserCreateMutationVariables>(UserCreateDocument, options);
-}
-export type UserCreateMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UserCreateMutation, UserCreateMutationVariables>;
-export const GetGameDocument = gql`
-    query GetGame($gameCode: String!) {
+export const GameInfoDocument = gql`
+    query gameInfo($gameCode: String!) {
   game(gameCode: $gameCode) {
-    ...Game
-    gameUserLink {
-      ...GameUserLink
-      game {
-        ...Game
-      }
-      user {
-        ...User
-      }
-    }
-    battles {
-      ...Battle
-    }
+    ...GameInfo
   }
 }
-    ${GameFragmentDoc}
-${GameUserLinkFragmentDoc}
-${UserFragmentDoc}
-${BattleFragmentDoc}`;
+    ${GameInfoFragmentDoc}`;
 
 /**
- * __useGetGameQuery__
+ * __useGameInfoQuery__
  *
- * To run a query within a Vue component, call `useGetGameQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetGameQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * To run a query within a Vue component, call `useGameInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGameInfoQuery` returns an object from Apollo Client that contains result, loading and error properties
  * you can use to render your UI.
  *
  * @param variables that will be passed into the query
  * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
  *
  * @example
- * const { result, loading, error } = useGetGameQuery({
+ * const { result, loading, error } = useGameInfoQuery({
  *   gameCode: // value for 'gameCode'
  * });
  */
-export function useGetGameQuery(variables: GetGameQueryVariables | VueCompositionApi.Ref<GetGameQueryVariables> | ReactiveFunction<GetGameQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables>> = {}) {
-  return VueApolloComposable.useQuery<GetGameQuery, GetGameQueryVariables>(GetGameDocument, variables, options);
+export function useGameInfoQuery(variables: GameInfoQueryVariables | VueCompositionApi.Ref<GameInfoQueryVariables> | ReactiveFunction<GameInfoQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameInfoQuery, GameInfoQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameInfoQuery, GameInfoQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameInfoQuery, GameInfoQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GameInfoQuery, GameInfoQueryVariables>(GameInfoDocument, variables, options);
 }
-export function useGetGameLazyQuery(variables: GetGameQueryVariables | VueCompositionApi.Ref<GetGameQueryVariables> | ReactiveFunction<GetGameQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetGameQuery, GetGameQueryVariables>> = {}) {
-  return VueApolloComposable.useLazyQuery<GetGameQuery, GetGameQueryVariables>(GetGameDocument, variables, options);
+export function useGameInfoLazyQuery(variables: GameInfoQueryVariables | VueCompositionApi.Ref<GameInfoQueryVariables> | ReactiveFunction<GameInfoQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameInfoQuery, GameInfoQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameInfoQuery, GameInfoQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameInfoQuery, GameInfoQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GameInfoQuery, GameInfoQueryVariables>(GameInfoDocument, variables, options);
 }
-export type GetGameQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetGameQuery, GetGameQueryVariables>;
-export const GetUserDocument = gql`
-    query GetUser($id: ID!) {
-  user(id: $id) {
-    ...User
+export type GameInfoQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GameInfoQuery, GameInfoQueryVariables>;
+export const GamePlayersDocument = gql`
+    query gamePlayers($gameCode: String!) {
+  game(gameCode: $gameCode) {
+    ...GameInfo
+    gameUserLinks {
+      id
+      SVCModel
+      user {
+        id
+        name
+        avatar
+      }
+    }
   }
 }
-    ${UserFragmentDoc}`;
+    ${GameInfoFragmentDoc}`;
 
 /**
- * __useGetUserQuery__
+ * __useGamePlayersQuery__
  *
- * To run a query within a Vue component, call `useGetUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetUserQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * To run a query within a Vue component, call `useGamePlayersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGamePlayersQuery` returns an object from Apollo Client that contains result, loading and error properties
  * you can use to render your UI.
  *
  * @param variables that will be passed into the query
  * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
  *
  * @example
- * const { result, loading, error } = useGetUserQuery({
- *   id: // value for 'id'
+ * const { result, loading, error } = useGamePlayersQuery({
+ *   gameCode: // value for 'gameCode'
  * });
  */
-export function useGetUserQuery(variables: GetUserQueryVariables | VueCompositionApi.Ref<GetUserQueryVariables> | ReactiveFunction<GetUserQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetUserQuery, GetUserQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetUserQuery, GetUserQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetUserQuery, GetUserQueryVariables>> = {}) {
-  return VueApolloComposable.useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, variables, options);
+export function useGamePlayersQuery(variables: GamePlayersQueryVariables | VueCompositionApi.Ref<GamePlayersQueryVariables> | ReactiveFunction<GamePlayersQueryVariables>, options: VueApolloComposable.UseQueryOptions<GamePlayersQuery, GamePlayersQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GamePlayersQuery, GamePlayersQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GamePlayersQuery, GamePlayersQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GamePlayersQuery, GamePlayersQueryVariables>(GamePlayersDocument, variables, options);
 }
-export function useGetUserLazyQuery(variables: GetUserQueryVariables | VueCompositionApi.Ref<GetUserQueryVariables> | ReactiveFunction<GetUserQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetUserQuery, GetUserQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetUserQuery, GetUserQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetUserQuery, GetUserQueryVariables>> = {}) {
-  return VueApolloComposable.useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, variables, options);
+export function useGamePlayersLazyQuery(variables: GamePlayersQueryVariables | VueCompositionApi.Ref<GamePlayersQueryVariables> | ReactiveFunction<GamePlayersQueryVariables>, options: VueApolloComposable.UseQueryOptions<GamePlayersQuery, GamePlayersQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GamePlayersQuery, GamePlayersQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GamePlayersQuery, GamePlayersQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GamePlayersQuery, GamePlayersQueryVariables>(GamePlayersDocument, variables, options);
 }
-export type GetUserQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetUserQuery, GetUserQueryVariables>;
-export const GetBattleDocument = gql`
-    query GetBattle($id: ID!) {
-  battle(id: $id) {
-    ...Battle
+export type GamePlayersQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GamePlayersQuery, GamePlayersQueryVariables>;
+export const GameUserLinkInfoByCodeDocument = gql`
+    query gameUserLinkInfoByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
+    ...GameUserLinkInfo
   }
 }
-    ${BattleFragmentDoc}`;
+    ${GameUserLinkInfoFragmentDoc}`;
 
 /**
- * __useGetBattleQuery__
+ * __useGameUserLinkInfoByCodeQuery__
  *
- * To run a query within a Vue component, call `useGetBattleQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetBattleQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * To run a query within a Vue component, call `useGameUserLinkInfoByCodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGameUserLinkInfoByCodeQuery` returns an object from Apollo Client that contains result, loading and error properties
  * you can use to render your UI.
  *
  * @param variables that will be passed into the query
  * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
  *
  * @example
- * const { result, loading, error } = useGetBattleQuery({
- *   id: // value for 'id'
+ * const { result, loading, error } = useGameUserLinkInfoByCodeQuery({
+ *   gameCode: // value for 'gameCode'
  * });
  */
-export function useGetBattleQuery(variables: GetBattleQueryVariables | VueCompositionApi.Ref<GetBattleQueryVariables> | ReactiveFunction<GetBattleQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetBattleQuery, GetBattleQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattleQuery, GetBattleQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattleQuery, GetBattleQueryVariables>> = {}) {
-  return VueApolloComposable.useQuery<GetBattleQuery, GetBattleQueryVariables>(GetBattleDocument, variables, options);
+export function useGameUserLinkInfoByCodeQuery(variables: GameUserLinkInfoByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkInfoByCodeQueryVariables> | ReactiveFunction<GameUserLinkInfoByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>(GameUserLinkInfoByCodeDocument, variables, options);
 }
-export function useGetBattleLazyQuery(variables: GetBattleQueryVariables | VueCompositionApi.Ref<GetBattleQueryVariables> | ReactiveFunction<GetBattleQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetBattleQuery, GetBattleQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattleQuery, GetBattleQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattleQuery, GetBattleQueryVariables>> = {}) {
-  return VueApolloComposable.useLazyQuery<GetBattleQuery, GetBattleQueryVariables>(GetBattleDocument, variables, options);
+export function useGameUserLinkInfoByCodeLazyQuery(variables: GameUserLinkInfoByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkInfoByCodeQueryVariables> | ReactiveFunction<GameUserLinkInfoByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>(GameUserLinkInfoByCodeDocument, variables, options);
 }
-export type GetBattleQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetBattleQuery, GetBattleQueryVariables>;
-export const GetBattlesDocument = gql`
-    query GetBattles {
-  battles {
-    ...Battle
-  }
-}
-    ${BattleFragmentDoc}`;
-
-/**
- * __useGetBattlesQuery__
- *
- * To run a query within a Vue component, call `useGetBattlesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetBattlesQuery` returns an object from Apollo Client that contains result, loading and error properties
- * you can use to render your UI.
- *
- * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
- *
- * @example
- * const { result, loading, error } = useGetBattlesQuery();
- */
-export function useGetBattlesQuery(options: VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> = {}) {
-  return VueApolloComposable.useQuery<GetBattlesQuery, GetBattlesQueryVariables>(GetBattlesDocument, {}, options);
-}
-export function useGetBattlesLazyQuery(options: VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattlesQuery, GetBattlesQueryVariables>> = {}) {
-  return VueApolloComposable.useLazyQuery<GetBattlesQuery, GetBattlesQueryVariables>(GetBattlesDocument, {}, options);
-}
-export type GetBattlesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetBattlesQuery, GetBattlesQueryVariables>;
-export const GetBattleViewerDocument = gql`
-    query GetBattleViewer($userId: ID!) {
-  battleViewer(userId: $userId) {
-    ...Battle
-  }
-}
-    ${BattleFragmentDoc}`;
-
-/**
- * __useGetBattleViewerQuery__
- *
- * To run a query within a Vue component, call `useGetBattleViewerQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetBattleViewerQuery` returns an object from Apollo Client that contains result, loading and error properties
- * you can use to render your UI.
- *
- * @param variables that will be passed into the query
- * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
- *
- * @example
- * const { result, loading, error } = useGetBattleViewerQuery({
- *   userId: // value for 'userId'
- * });
- */
-export function useGetBattleViewerQuery(variables: GetBattleViewerQueryVariables | VueCompositionApi.Ref<GetBattleViewerQueryVariables> | ReactiveFunction<GetBattleViewerQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> = {}) {
-  return VueApolloComposable.useQuery<GetBattleViewerQuery, GetBattleViewerQueryVariables>(GetBattleViewerDocument, variables, options);
-}
-export function useGetBattleViewerLazyQuery(variables: GetBattleViewerQueryVariables | VueCompositionApi.Ref<GetBattleViewerQueryVariables> | ReactiveFunction<GetBattleViewerQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBattleViewerQuery, GetBattleViewerQueryVariables>> = {}) {
-  return VueApolloComposable.useLazyQuery<GetBattleViewerQuery, GetBattleViewerQueryVariables>(GetBattleViewerDocument, variables, options);
-}
-export type GetBattleViewerQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetBattleViewerQuery, GetBattleViewerQueryVariables>;
-export const GetViewerDocument = gql`
-    query GetViewer {
-  viewer {
-    ...User
-  }
-}
-    ${UserFragmentDoc}`;
-
-/**
- * __useGetViewerQuery__
- *
- * To run a query within a Vue component, call `useGetViewerQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetViewerQuery` returns an object from Apollo Client that contains result, loading and error properties
- * you can use to render your UI.
- *
- * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
- *
- * @example
- * const { result, loading, error } = useGetViewerQuery();
- */
-export function useGetViewerQuery(options: VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> = {}) {
-  return VueApolloComposable.useQuery<GetViewerQuery, GetViewerQueryVariables>(GetViewerDocument, {}, options);
-}
-export function useGetViewerLazyQuery(options: VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetViewerQuery, GetViewerQueryVariables>> = {}) {
-  return VueApolloComposable.useLazyQuery<GetViewerQuery, GetViewerQueryVariables>(GetViewerDocument, {}, options);
-}
-export type GetViewerQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetViewerQuery, GetViewerQueryVariables>;
+export type GameUserLinkInfoByCodeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>;

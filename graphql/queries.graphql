@@ -1,47 +1,25 @@
-query GetGame($gameCode: String!) {
+query gameInfo($gameCode: String!) {
   game(gameCode: $gameCode) {
-    ...Game
-    gameUserLink {
-      ...GameUserLink
-      game {
-        ...Game
-      }
-      user {
-        ...User
-      }
+  ...GameInfo
+  }
+}
+
+query gamePlayers($gameCode: String!) {
+  game(gameCode: $gameCode) {
+  ...GameInfo
+  gameUserLinks {
+    id
+    SVCModel
+    user {
+      id
+      name
+      avatar
     }
-    battles {
-      ...Battle
-    }
+  }
   }
 }
-
-query GetUser($id: ID!) {
-  user(id: $id) {
-    ...User
-  }
-}
-
-query GetBattle($id: ID!) {
-  battle(id: $id) {
-    ...Battle
-  }
-}
-
-query GetBattles {
-  battles {
-    ...Battle
-  }
-}
-
-query GetBattleViewer($userId: ID!) {
-  battleViewer(userId: $userId) {
-    ...Battle
-  }
-}
-
-query GetViewer {
-  viewer {
-    ...User
+query gameUserLinkInfoByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    ...GameUserLinkInfo
   }
 }

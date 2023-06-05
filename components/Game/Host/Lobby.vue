@@ -27,13 +27,13 @@
 </template>
 
 <script lang="ts" setup>
-import { useGameStartMutation, useGetGameQuery } from '~~/graphql/generated/graphql'
+import { useGameStartMutation, useGamePlayersQuery } from '~~/graphql/generated/graphql'
 
 const { gameCode } = defineProps<{
               gameCode: string,
               }>()
 
-const { result, loading: gameLoading } = useGetGameQuery({ gameCode }, { pollInterval: 1500 })
+const { result, loading: gameLoading } = useGamePlayersQuery({ gameCode }, { pollInterval: 1500 })
 const { mutate: startGameMutate, loading: startGameLoading } = useGameStartMutation()
 const loading = computed(() => gameLoading.value || startGameLoading.value)
 
@@ -41,7 +41,8 @@ function startGame () {
   startGameMutate(
     {
       input: {
-        gameCode
+        gameCode,
+        numberOfRounds: 3
       }
     }
   )
@@ -50,5 +51,5 @@ function startGame () {
     })
 }
 
-const players = computed(() => result.value?.game?.gameUserLink.map(x => x.user))
+const players = computed(() => result.value?.game?.gameUserLinks.map(x => x.user))
 </script>

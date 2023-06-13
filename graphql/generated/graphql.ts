@@ -162,6 +162,7 @@ export type GameUserLink = {
   SVCModel: SvcModel;
   adlibs: Array<Adlib>;
   game: Game;
+  givenAttributesAuthored: Array<GivenAttribute>;
   id: Scalars['ID'];
   isHost: Scalars['Boolean'];
   user: User;
@@ -361,6 +362,8 @@ export type GameInfoFragment = { __typename?: 'Game', id: string, gameCode: stri
 
 export type GameUserLinkInfoFragment = { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } };
 
+export type GivenAttributeInfoFragment = { __typename?: 'GivenAttribute', id: string, attribute?: string | null, target: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } };
+
 export type GameCreateMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -379,6 +382,13 @@ export type GameStartMutationVariables = Exact<{
 
 
 export type GameStartMutation = { __typename?: 'Mutation', gameStart?: { __typename?: 'GameStartPayload', game: { __typename?: 'Game', id: string, gameCode: string, state: GameState } } | null };
+
+export type GivenAttributeSubmitMutationVariables = Exact<{
+  input: GivenAttributeSubmitInput;
+}>;
+
+
+export type GivenAttributeSubmitMutation = { __typename?: 'Mutation', givenAttributeSubmit?: { __typename?: 'GivenAttributeSubmitPayload', givenAttribute: { __typename?: 'GivenAttribute', id: string, attribute?: string | null, target: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } } } | null };
 
 export type GameInfoQueryVariables = Exact<{
   gameCode: Scalars['String'];
@@ -400,6 +410,13 @@ export type GameUserLinkInfoByCodeQueryVariables = Exact<{
 
 
 export type GameUserLinkInfoByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } } | null };
+
+export type GameUserLinkAttributesByCodeQueryVariables = Exact<{
+  gameCode: Scalars['String'];
+}>;
+
+
+export type GameUserLinkAttributesByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, givenAttributesAuthored: Array<{ __typename?: 'GivenAttribute', id: string, attribute?: string | null, target: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> } | null };
 
 export const GameInfoFragmentDoc = gql`
     fragment GameInfo on Game {
@@ -423,6 +440,19 @@ export const GameUserLinkInfoFragmentDoc = gql`
   adlibs
 }
     ${GameInfoFragmentDoc}`;
+export const GivenAttributeInfoFragmentDoc = gql`
+    fragment GivenAttributeInfo on GivenAttribute {
+  id
+  attribute
+  target {
+    id
+    user {
+      id
+      name
+    }
+  }
+}
+    `;
 export const GameCreateDocument = gql`
     mutation gameCreate {
   gameCreate {
@@ -514,6 +544,37 @@ export function useGameStartMutation(options: VueApolloComposable.UseMutationOpt
   return VueApolloComposable.useMutation<GameStartMutation, GameStartMutationVariables>(GameStartDocument, options);
 }
 export type GameStartMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GameStartMutation, GameStartMutationVariables>;
+export const GivenAttributeSubmitDocument = gql`
+    mutation givenAttributeSubmit($input: GivenAttributeSubmitInput!) {
+  givenAttributeSubmit(input: $input) {
+    givenAttribute {
+      ...GivenAttributeInfo
+    }
+  }
+}
+    ${GivenAttributeInfoFragmentDoc}`;
+
+/**
+ * __useGivenAttributeSubmitMutation__
+ *
+ * To run a mutation, you first call `useGivenAttributeSubmitMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useGivenAttributeSubmitMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useGivenAttributeSubmitMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGivenAttributeSubmitMutation(options: VueApolloComposable.UseMutationOptions<GivenAttributeSubmitMutation, GivenAttributeSubmitMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<GivenAttributeSubmitMutation, GivenAttributeSubmitMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<GivenAttributeSubmitMutation, GivenAttributeSubmitMutationVariables>(GivenAttributeSubmitDocument, options);
+}
+export type GivenAttributeSubmitMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GivenAttributeSubmitMutation, GivenAttributeSubmitMutationVariables>;
 export const GameInfoDocument = gql`
     query gameInfo($gameCode: String!) {
   game(gameCode: $gameCode) {
@@ -613,3 +674,36 @@ export function useGameUserLinkInfoByCodeLazyQuery(variables: GameUserLinkInfoBy
   return VueApolloComposable.useLazyQuery<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>(GameUserLinkInfoByCodeDocument, variables, options);
 }
 export type GameUserLinkInfoByCodeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GameUserLinkInfoByCodeQuery, GameUserLinkInfoByCodeQueryVariables>;
+export const GameUserLinkAttributesByCodeDocument = gql`
+    query gameUserLinkAttributesByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
+    id
+    givenAttributesAuthored {
+      ...GivenAttributeInfo
+    }
+  }
+}
+    ${GivenAttributeInfoFragmentDoc}`;
+
+/**
+ * __useGameUserLinkAttributesByCodeQuery__
+ *
+ * To run a query within a Vue component, call `useGameUserLinkAttributesByCodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGameUserLinkAttributesByCodeQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGameUserLinkAttributesByCodeQuery({
+ *   gameCode: // value for 'gameCode'
+ * });
+ */
+export function useGameUserLinkAttributesByCodeQuery(variables: GameUserLinkAttributesByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkAttributesByCodeQueryVariables> | ReactiveFunction<GameUserLinkAttributesByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>(GameUserLinkAttributesByCodeDocument, variables, options);
+}
+export function useGameUserLinkAttributesByCodeLazyQuery(variables: GameUserLinkAttributesByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkAttributesByCodeQueryVariables> | ReactiveFunction<GameUserLinkAttributesByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>(GameUserLinkAttributesByCodeDocument, variables, options);
+}
+export type GameUserLinkAttributesByCodeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>;

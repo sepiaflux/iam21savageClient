@@ -138,6 +138,7 @@ type GameUserLink {
   SVCModel: SVCModel!
   adlibs: [Adlib!]!
   game: Game!
+  givenAttributesAuthored: [GivenAttribute!]!
   id: ID!
   isHost: Boolean!
   user: User!

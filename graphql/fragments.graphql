@@ -17,3 +17,15 @@ fragment GameUserLinkInfo on GameUserLink {
   SVCModel
   adlibs
 }
+
+fragment GivenAttributeInfo on GivenAttribute {
+  id
+  attribute
+  target {
+    id
+    user {
+      id
+      name
+    }
+  }
+}

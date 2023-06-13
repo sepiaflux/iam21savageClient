@@ -24,3 +24,10 @@ mutation gameStart($input: GameStartInput!) {
   }
 }
 
+mutation givenAttributeSubmit($input: GivenAttributeSubmitInput!) {
+  givenAttributeSubmit(input: $input) {
+    givenAttribute {
+      ...GivenAttributeInfo
+    }
+  }
+}

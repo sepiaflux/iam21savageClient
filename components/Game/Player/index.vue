@@ -7,6 +7,8 @@
     {{ error }}
   </div>
   <GamePlayerLobby v-else-if="gameState === GameState.WaitingToJoin" :game-code="gameCode" />
+  <GamePlayerAttributes v-else-if="gameState === GameState.Attributes" :game-code="gameCode" />
+  <GamePlayerPrompt v-else-if="gameState === GameState.Prompt" :game-code="gameCode" />
 </template>
 
 <script lang="ts" setup>

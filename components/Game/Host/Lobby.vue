@@ -42,7 +42,7 @@ function startGame () {
     {
       input: {
         gameCode,
-        numberOfRounds: 3
+        numberOfRounds: 1
       }
     }
   )

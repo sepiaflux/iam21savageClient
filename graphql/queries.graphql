@@ -23,3 +23,12 @@ query gameUserLinkInfoByCode($gameCode: String!){
     ...GameUserLinkInfo
   }
 }
+
+query gameUserLinkAttributesByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    id
+    givenAttributesAuthored {
+      ...GivenAttributeInfo
+    }
+  }
+}

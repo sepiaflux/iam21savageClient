@@ -32,6 +32,7 @@ export enum Adlib {
 
 export type Battle = {
   __typename?: 'Battle';
+  active: Scalars['Boolean'];
   gameRound: GameRound;
   id: Scalars['ID'];
   participations: Array<BattleParticipation>;
@@ -42,6 +43,16 @@ export type BattleCreateInput = {
   battleParticipationsCreateInput: Array<BattleParticipationCreateInput>;
   gameCode: Scalars['ID'];
   roundIndex: Scalars['Int'];
+};
+
+export type BattleNextActiveInput = {
+  battleId: Scalars['ID'];
+};
+
+export type BattleNextActivePayload = {
+  __typename?: 'BattleNextActivePayload';
+  newBattle: Battle;
+  oldBattle: Battle;
 };
 
 export type BattleParticipation = {
@@ -132,6 +143,7 @@ export type GameJoinPayload = {
 
 export type GameRound = {
   __typename?: 'GameRound';
+  active: Scalars['Boolean'];
   battles: Array<Battle>;
   game: Game;
   id: Scalars['ID'];
@@ -161,6 +173,8 @@ export type GameUserLink = {
   __typename?: 'GameUserLink';
   SVCModel: SvcModel;
   adlibs: Array<Adlib>;
+  battleParticipations: Array<BattleParticipation>;
+  battles: Array<Battle>;
   game: Game;
   givenAttributesAuthored: Array<GivenAttribute>;
   id: Scalars['ID'];
@@ -189,6 +203,7 @@ export type GivenAttributeSubmitPayload = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  battleNextActive?: Maybe<BattleNextActivePayload>;
   battleSubmit?: Maybe<BattleSubmitPayload>;
   /** game gets created instantly (and if eMail then invited) */
   connectToCloudFunc?: Maybe<ConnectToCloudFuncPayload>;
@@ -201,6 +216,11 @@ export type Mutation = {
   userCreate?: Maybe<UserCreatePayload>;
   /** employee gets created instantly (and if eMail then invited) */
   vote?: Maybe<VotePayload>;
+};
+
+
+export type MutationBattleNextActiveArgs = {
+  input: BattleNextActiveInput;
 };
 
 
@@ -390,6 +410,20 @@ export type GivenAttributeSubmitMutationVariables = Exact<{
 
 export type GivenAttributeSubmitMutation = { __typename?: 'Mutation', givenAttributeSubmit?: { __typename?: 'GivenAttributeSubmitPayload', givenAttribute: { __typename?: 'GivenAttribute', id: string, attribute?: string | null, target: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } } } | null };
 
+export type BattleSubmitMutationVariables = Exact<{
+  input: BattleSubmitInput;
+}>;
+
+
+export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> } } | null };
+
+export type BattleNextActiveMutationVariables = Exact<{
+  input: BattleNextActiveInput;
+}>;
+
+
+export type BattleNextActiveMutation = { __typename?: 'Mutation', battleNextActive?: { __typename?: 'BattleNextActivePayload', oldBattle: { __typename?: 'Battle', id: string, active: boolean }, newBattle: { __typename?: 'Battle', id: string, active: boolean } } | null };
+
 export type GameInfoQueryVariables = Exact<{
   gameCode: Scalars['String'];
 }>;
@@ -417,6 +451,20 @@ export type GameUserLinkAttributesByCodeQueryVariables = Exact<{
 
 
 export type GameUserLinkAttributesByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, givenAttributesAuthored: Array<{ __typename?: 'GivenAttribute', id: string, attribute?: string | null, target: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> } | null };
+
+export type GameUserLinkBattleParticipationsByCodeQueryVariables = Exact<{
+  gameCode: Scalars['String'];
+}>;
+
+
+export type GameUserLinkBattleParticipationsByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> } }> } | null };
+
+export type GameUserLinkBattlesByCodeQueryVariables = Exact<{
+  gameCode: Scalars['String'];
+}>;
+
+
+export type GameUserLinkBattlesByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, game: { __typename?: 'Game', id: string, state: GameState, gameRounds: Array<{ __typename?: 'GameRound', id: string, active: boolean, battles: Array<{ __typename?: 'Battle', id: string, active: boolean, participations: Array<{ __typename?: 'BattleParticipation', id: string, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> }> }> } } | null };
 
 export const GameInfoFragmentDoc = gql`
     fragment GameInfo on Game {
@@ -575,6 +623,89 @@ export function useGivenAttributeSubmitMutation(options: VueApolloComposable.Use
   return VueApolloComposable.useMutation<GivenAttributeSubmitMutation, GivenAttributeSubmitMutationVariables>(GivenAttributeSubmitDocument, options);
 }
 export type GivenAttributeSubmitMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GivenAttributeSubmitMutation, GivenAttributeSubmitMutationVariables>;
+export const BattleSubmitDocument = gql`
+    mutation battleSubmit($input: BattleSubmitInput!) {
+  battleSubmit(input: $input) {
+    battle {
+      id
+      gameRound {
+        id
+        active
+      }
+      participations {
+        id
+        openAIFirstPart
+        userMiddlePart
+        participant {
+          id
+          user {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useBattleSubmitMutation__
+ *
+ * To run a mutation, you first call `useBattleSubmitMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useBattleSubmitMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useBattleSubmitMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBattleSubmitMutation(options: VueApolloComposable.UseMutationOptions<BattleSubmitMutation, BattleSubmitMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<BattleSubmitMutation, BattleSubmitMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<BattleSubmitMutation, BattleSubmitMutationVariables>(BattleSubmitDocument, options);
+}
+export type BattleSubmitMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<BattleSubmitMutation, BattleSubmitMutationVariables>;
+export const BattleNextActiveDocument = gql`
+    mutation battleNextActive($input: BattleNextActiveInput!) {
+  battleNextActive(input: $input) {
+    oldBattle {
+      id
+      active
+    }
+    newBattle {
+      id
+      active
+    }
+  }
+}
+    `;
+
+/**
+ * __useBattleNextActiveMutation__
+ *
+ * To run a mutation, you first call `useBattleNextActiveMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useBattleNextActiveMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useBattleNextActiveMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBattleNextActiveMutation(options: VueApolloComposable.UseMutationOptions<BattleNextActiveMutation, BattleNextActiveMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<BattleNextActiveMutation, BattleNextActiveMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<BattleNextActiveMutation, BattleNextActiveMutationVariables>(BattleNextActiveDocument, options);
+}
+export type BattleNextActiveMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<BattleNextActiveMutation, BattleNextActiveMutationVariables>;
 export const GameInfoDocument = gql`
     query gameInfo($gameCode: String!) {
   game(gameCode: $gameCode) {
@@ -707,3 +838,109 @@ export function useGameUserLinkAttributesByCodeLazyQuery(variables: GameUserLink
   return VueApolloComposable.useLazyQuery<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>(GameUserLinkAttributesByCodeDocument, variables, options);
 }
 export type GameUserLinkAttributesByCodeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GameUserLinkAttributesByCodeQuery, GameUserLinkAttributesByCodeQueryVariables>;
+export const GameUserLinkBattleParticipationsByCodeDocument = gql`
+    query gameUserLinkBattleParticipationsByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
+    id
+    battleParticipations {
+      id
+      openAIFirstPart
+      userMiddlePart
+      battle {
+        id
+        gameRound {
+          id
+          active
+        }
+        participations {
+          id
+          participant {
+            id
+            user {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGameUserLinkBattleParticipationsByCodeQuery__
+ *
+ * To run a query within a Vue component, call `useGameUserLinkBattleParticipationsByCodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGameUserLinkBattleParticipationsByCodeQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGameUserLinkBattleParticipationsByCodeQuery({
+ *   gameCode: // value for 'gameCode'
+ * });
+ */
+export function useGameUserLinkBattleParticipationsByCodeQuery(variables: GameUserLinkBattleParticipationsByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkBattleParticipationsByCodeQueryVariables> | ReactiveFunction<GameUserLinkBattleParticipationsByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables>(GameUserLinkBattleParticipationsByCodeDocument, variables, options);
+}
+export function useGameUserLinkBattleParticipationsByCodeLazyQuery(variables: GameUserLinkBattleParticipationsByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkBattleParticipationsByCodeQueryVariables> | ReactiveFunction<GameUserLinkBattleParticipationsByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables>(GameUserLinkBattleParticipationsByCodeDocument, variables, options);
+}
+export type GameUserLinkBattleParticipationsByCodeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GameUserLinkBattleParticipationsByCodeQuery, GameUserLinkBattleParticipationsByCodeQueryVariables>;
+export const GameUserLinkBattlesByCodeDocument = gql`
+    query gameUserLinkBattlesByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
+    id
+    game {
+      id
+      state
+      gameRounds {
+        id
+        active
+        battles {
+          id
+          active
+          participations {
+            id
+            rapText
+            audioURL
+            participant {
+              id
+              user {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGameUserLinkBattlesByCodeQuery__
+ *
+ * To run a query within a Vue component, call `useGameUserLinkBattlesByCodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGameUserLinkBattlesByCodeQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGameUserLinkBattlesByCodeQuery({
+ *   gameCode: // value for 'gameCode'
+ * });
+ */
+export function useGameUserLinkBattlesByCodeQuery(variables: GameUserLinkBattlesByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkBattlesByCodeQueryVariables> | ReactiveFunction<GameUserLinkBattlesByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables>(GameUserLinkBattlesByCodeDocument, variables, options);
+}
+export function useGameUserLinkBattlesByCodeLazyQuery(variables: GameUserLinkBattlesByCodeQueryVariables | VueCompositionApi.Ref<GameUserLinkBattlesByCodeQueryVariables> | ReactiveFunction<GameUserLinkBattlesByCodeQueryVariables>, options: VueApolloComposable.UseQueryOptions<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables>(GameUserLinkBattlesByCodeDocument, variables, options);
+}
+export type GameUserLinkBattlesByCodeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GameUserLinkBattlesByCodeQuery, GameUserLinkBattlesByCodeQueryVariables>;

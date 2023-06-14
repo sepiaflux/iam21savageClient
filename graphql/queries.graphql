@@ -32,3 +32,63 @@ query gameUserLinkAttributesByCode($gameCode: String!){
     }
   }
 }
+
+query gameUserLinkBattleParticipationsByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    id
+    battleParticipations {
+      id
+      openAIFirstPart
+      userMiddlePart
+      battle {
+        id
+        gameRound {
+          id
+          active
+        }
+        participations{
+          id
+          participant{
+            id
+            user {
+              id
+              name
+            }
+          }
+        }
+      }
+
+
+    }
+  }
+}
+
+query gameUserLinkBattlesByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    id
+    game {
+      id
+      state
+      gameRounds {
+        id
+        active
+        battles {
+          id
+          active
+          participations {
+            id
+            rapText
+            audioURL
+            participant {
+              id
+              user {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

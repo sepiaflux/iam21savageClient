@@ -10,6 +10,7 @@ enum Adlib {
 }
 
 type Battle {
+  active: Boolean!
   gameRound: GameRound!
   id: ID!
   participations: [BattleParticipation!]!
@@ -20,6 +21,15 @@ input BattleCreateInput {
   battleParticipationsCreateInput: [BattleParticipationCreateInput!]!
   gameCode: ID!
   roundIndex: Int!
+}
+
+input BattleNextActiveInput {
+  battleId: ID!
+}
+
+type BattleNextActivePayload {
+  newBattle: Battle!
+  oldBattle: Battle!
 }
 
 type BattleParticipation {
@@ -110,6 +120,7 @@ type GameJoinPayload {
 }
 
 type GameRound {
+  active: Boolean!
   battles: [Battle!]!
   game: Game!
   id: ID!
@@ -137,6 +148,8 @@ enum GameState {
 type GameUserLink {
   SVCModel: SVCModel!
   adlibs: [Adlib!]!
+  battleParticipations: [BattleParticipation!]!
+  battles: [Battle!]!
   game: Game!
   givenAttributesAuthored: [GivenAttribute!]!
   id: ID!
@@ -162,6 +175,7 @@ type GivenAttributeSubmitPayload {
 }
 
 type Mutation {
+  battleNextActive(input: BattleNextActiveInput!): BattleNextActivePayload
   battleSubmit(input: BattleSubmitInput!): BattleSubmitPayload
 
   """game gets created instantly (and if eMail then invited)"""

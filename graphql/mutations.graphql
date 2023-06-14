@@ -31,3 +31,40 @@ mutation givenAttributeSubmit($input: GivenAttributeSubmitInput!) {
     }
   }
 }
+
+mutation battleSubmit($input: BattleSubmitInput!) {
+  battleSubmit(input: $input) {
+    battle {
+              id
+        gameRound {
+          id
+          active
+        }
+        participations{
+          id
+          openAIFirstPart
+          userMiddlePart
+          participant{
+            id
+            user {
+              id
+              name
+            }
+          }
+        }
+    }
+  }
+}
+
+mutation battleNextActive($input: BattleNextActiveInput!) {
+  battleNextActive(input: $input) {
+    oldBattle {
+      id
+      active
+    }
+    newBattle {
+      id 
+      active
+    }
+  }
+}

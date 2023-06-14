@@ -139,6 +139,7 @@ enum GameState {
   Attributes
   Battle
   FinalScreen
+  Loading
   Prompt
   Results
   Voting

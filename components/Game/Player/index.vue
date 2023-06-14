@@ -9,6 +9,7 @@
   <GamePlayerLobby v-else-if="gameState === GameState.WaitingToJoin" :game-code="gameCode" />
   <GamePlayerAttributes v-else-if="gameState === GameState.Attributes" :game-code="gameCode" />
   <GamePlayerPrompt v-else-if="gameState === GameState.Prompt" :game-code="gameCode" />
+  <GamePlayerLoading v-else-if="gameState === GameState.Loading" :game-code="gameCode" />
   <GamePlayerBattle v-else-if="gameState === GameState.Battle" :game-code="gameCode" />
   <div class="text-gray-200 font-sm mt-12" @click="leaveGame">
     Spiel verlassen

@@ -38,7 +38,6 @@ const numberOfInactiveBattles = computed(() => activeRound.value?.battles.filter
 
 function playSound (url: string) {
   if (playingAudio.value) {
-    console.log('pausing')
     playingAudio.value.pause()
   }
   const audio = new Audio(url)
@@ -48,7 +47,6 @@ function playSound (url: string) {
 }
 
 function handleAudioEnded () {
-  console.log('yooo!!!')
   if (firstPerson.value) {
     firstPerson.value = false
   } else if (numberOfInactiveBattles.value && numberOfInactiveBattles.value > 0) {

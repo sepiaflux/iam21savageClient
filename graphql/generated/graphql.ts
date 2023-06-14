@@ -163,6 +163,7 @@ export enum GameState {
   Attributes = 'Attributes',
   Battle = 'Battle',
   FinalScreen = 'FinalScreen',
+  Loading = 'Loading',
   Prompt = 'Prompt',
   Results = 'Results',
   Voting = 'Voting',

@@ -53,6 +53,11 @@ function handleAudioEnded () {
     activateNextBattle()
   }
 }
+onUnmounted(() => {
+  if (playingAudio.value) {
+    playingAudio.value.pause()
+  }
+})
 
 watch(activeBattle, (val, oldVal) => {
   if (val && oldVal && val.id !== oldVal.id) {

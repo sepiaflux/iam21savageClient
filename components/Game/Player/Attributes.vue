@@ -4,7 +4,7 @@
     <div v-if="loading">
       ...
     </div>
-    <div v-else-if="attributes && currentAttributeIndex >= attributes?.length">
+    <div v-else-if="attributes && attributes.length === 0">
       Warte auf die anderen Spieler...
     </div>
     <form
@@ -45,10 +45,9 @@ const { gameCode } = defineProps<{
 const { result, loading: queryLoading } = useGameUserLinkAttributesByCodeQuery({ gameCode }, { pollInterval: 1500 })
 const { mutate, loading: mutateLoading } = useGivenAttributeSubmitMutation({})
 const loading = computed(() => queryLoading.value || mutateLoading.value)
-const currentAttributeIndex = ref(0)
 const textInput = ref('')
 const attributes = computed(() => result.value?.gameUserLinkByCode?.givenAttributesAuthored.filter(x => !x.attribute))
-const currentAttribute = computed(() => attributes.value?.[currentAttributeIndex.value])
+const currentAttribute = computed(() => attributes.value?.[0])
 function submitAttribute () {
   if (!textInput.value) {
     alert('Bitte gib etwas ein!')
@@ -64,7 +63,6 @@ function submitAttribute () {
       .catch((err) => {
         alert(err)
       }).then(() => {
-        currentAttributeIndex.value++
         textInput.value = ''
       })
   }

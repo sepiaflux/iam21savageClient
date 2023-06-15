@@ -14,7 +14,7 @@
       Previous Person in this battle
     </div>
     <div v-if="numberOfInactiveBattles && numberOfInactiveBattles > 0 && !firstPerson" class="text-gray-600" @click="activateNextBattle">
-      This Battle OLD!
+      next battle
     </div>
   </div>
 </template>

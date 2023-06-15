@@ -53,7 +53,7 @@ function handleAudioEnded () {
     activateNextBattle()
   }
 }
-onUnmounted(() => {
+onBeforeUnmount(() => {
   if (playingAudio.value) {
     playingAudio.value.pause()
   }

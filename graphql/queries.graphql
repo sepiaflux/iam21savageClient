@@ -1,47 +1,94 @@
-query GetGame($gameCode: String!) {
+query gameInfo($gameCode: String!) {
   game(gameCode: $gameCode) {
-    ...Game
-    gameUserLink {
-      ...GameUserLink
-      game {
-        ...Game
+  ...GameInfo
+  }
+}
+
+query gamePlayers($gameCode: String!) {
+  game(gameCode: $gameCode) {
+  ...GameInfo
+  gameUserLinks {
+    id
+    SVCModel
+    user {
+      id
+      name
+      avatar
+    }
+  }
+  }
+}
+query gameUserLinkInfoByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    ...GameUserLinkInfo
+  }
+}
+
+query gameUserLinkAttributesByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    id
+    givenAttributesAuthored {
+      ...GivenAttributeInfo
+    }
+  }
+}
+
+query gameUserLinkBattleParticipationsByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    id
+    battleParticipations {
+      id
+      openAIFirstPart
+      userMiddlePart
+      battle {
+        id
+        gameRound {
+          id
+          active
+        }
+        participations{
+          id
+          participant{
+            id
+            user {
+              id
+              name
+            }
+          }
+        }
       }
-      user {
-        ...User
+
+
+    }
+  }
+}
+
+query gameUserLinkBattlesByCode($gameCode: String!){
+  gameUserLinkByCode(gameCode: $gameCode){
+    id
+    game {
+      id
+      state
+      gameRounds {
+        id
+        active
+        battles {
+          id
+          active
+          participations {
+            id
+            rapText
+            audioURL
+            participant {
+              id
+              user {
+                id
+                name
+              }
+            }
+          }
+        }
       }
     }
-    battles {
-      ...Battle
-    }
-  }
-}
-
-query GetUser($id: ID!) {
-  user(id: $id) {
-    ...User
-  }
-}
-
-query GetBattle($id: ID!) {
-  battle(id: $id) {
-    ...Battle
-  }
-}
-
-query GetBattles {
-  battles {
-    ...Battle
-  }
-}
-
-query GetBattleViewer($userId: ID!) {
-  battleViewer(userId: $userId) {
-    ...Battle
-  }
-}
-
-query GetViewer {
-  viewer {
-    ...User
   }
 }

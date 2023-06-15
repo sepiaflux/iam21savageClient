@@ -1,58 +1,70 @@
-mutation BattleFirstSubmit($input: BattleFirstSubmitInput!) {
-  battleFirstSubmit(input: $input) {
-    battleParticipant {
-      ...BattleParticipant
-    }
-  }
-}
-
-mutation BattleSubmit($input: BattleSubmitInput!) {
-  battleSubmit(input: $input) {
-    battle {
-      ...Battle
-    }
-  }
-}
-
-mutation Vote($input: VoteInput!) {
-  vote(input: $input) {
-    battleParticipant {
-      ...BattleParticipant
-    }
-  }
-}
-
-mutation GameCreate($input: GameCreateInput!) {
-  gameCreate(input: $input) {
+mutation gameCreate {
+  gameCreate {
     gameUserLink {
-      ...GameUserLink
+      ...GameUserLinkInfo
     }
+    token
   }
 }
 
-mutation GameJoin($input: GameJoinInput!) {
+mutation gameJoin($input: GameJoinInput!) {
   gameJoin(input: $input) {
     gameUserLink {
-      ...GameUserLink
+      ...GameUserLinkInfo
     }
+    token
   }
 }
 
-mutation GameStart($input: GameStartInput!) {
+mutation gameStart($input: GameStartInput!) {
   gameStart(input: $input) {
     game {
-      ...Game
-    }
-    battles {
-      ...Battle
+      ...GameInfo
     }
   }
 }
 
-mutation UserCreate($input: UserCreateMutationInput!) {
-  userCreate(input: $input) {
-    user {
-      ...User
+mutation givenAttributeSubmit($input: GivenAttributeSubmitInput!) {
+  givenAttributeSubmit(input: $input) {
+    givenAttribute {
+      ...GivenAttributeInfo
+    }
+  }
+}
+
+mutation battleSubmit($input: BattleSubmitInput!) {
+  battleSubmit(input: $input) {
+    battle {
+              id
+        gameRound {
+          id
+          active
+        }
+        participations{
+          id
+          openAIFirstPart
+          userMiddlePart
+          participant{
+            id
+            user {
+              id
+              name
+            }
+          }
+        }
+    }
+  }
+}
+
+mutation battleNextActive($input: BattleNextActiveInput!) {
+  battleNextActive(input: $input) {
+    oldBattle {
+      id
+      active
+    }
+    newBattle {
+      id 
+      active
     }
   }
 }

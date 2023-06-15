@@ -10,47 +10,41 @@ enum Adlib {
 }
 
 type Battle {
-  battleParticipants: [BattleParticipant!]!
-  game: Game!
+  active: Boolean!
+  gameRound: GameRound!
   id: ID!
-  roundIndex: Int!
+  participations: [BattleParticipation!]!
+  votes: [Vote!]!
 }
 
 input BattleCreateInput {
-  battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
+  battleParticipationsCreateInput: [BattleParticipationCreateInput!]!
   gameCode: ID!
   roundIndex: Int!
 }
 
-input BattleFirstSubmitInput {
-  attribute1: String!
-  attribute2: String!
-  attribute3: String!
+input BattleNextActiveInput {
   battleId: ID!
-  deviceId: String!
 }
 
-type BattleFirstSubmitPayload {
-  battleParticipant: BattleParticipant!
+type BattleNextActivePayload {
+  newBattle: Battle!
+  oldBattle: Battle!
 }
 
-type BattleParticipant {
-  attribute1: String
-  attribute2: String
-  attribute3: String
-
+type BattleParticipation {
   """we use a service for this so this is the link to that service"""
   audioURL: String
   battle: Battle!
   id: ID!
   openAIFirstPart: String
-  participant: User!
+  participant: GameUserLink!
   rapText: String
   userMiddlePart: String
   votes: [Vote!]!
 }
 
-input BattleParticipantCreateInput {
+input BattleParticipationCreateInput {
   attribute1: String
   attribute2: String
   attribute3: String
@@ -61,7 +55,7 @@ input BattleParticipantCreateInput {
   userMiddlePart: String
 }
 
-input BattleParticipantUpdateInput {
+input BattleParticipationUpdateInput {
   attribute1: String
   attribute2: String
   attribute3: String
@@ -74,7 +68,6 @@ input BattleParticipantUpdateInput {
 
 input BattleSubmitInput {
   battleId: ID!
-  deviceId: String!
   middlePart: String!
 }
 
@@ -83,7 +76,7 @@ type BattleSubmitPayload {
 }
 
 input BattleUpdateInput {
-  battleParticipantsCreateInput: [BattleParticipantCreateInput!]!
+  battleParticipationsCreateInput: [BattleParticipationCreateInput!]!
   gameCode: ID!
   roundIndex: Int!
 }
@@ -100,12 +93,10 @@ scalar Date
 scalar DateTime
 
 type Game {
-  battles: [Battle!]!
   gameCode: String!
-  gameUserLink: [GameUserLink!]!
+  gameRounds: [GameRound!]!
+  gameUserLinks: [GameUserLink!]!
   id: ID!
-  numberOfRounds: Int!
-  roundIndex: Int!
   state: GameState!
 }
 
@@ -115,31 +106,40 @@ input GameCreateInput {
 
 type GameCreatePayload {
   gameUserLink: GameUserLink!
+  token: String
 }
 
 input GameJoinInput {
-  SVCModel: SVCModel!
-  adlibs: [Adlib!]!
   gameCode: ID!
-  userId: ID!
+  name: String!
 }
 
 type GameJoinPayload {
   gameUserLink: GameUserLink!
+  token: String
+}
+
+type GameRound {
+  active: Boolean!
+  battles: [Battle!]!
+  game: Game!
+  id: ID!
 }
 
 input GameStartInput {
   gameCode: ID!
+  numberOfRounds: Int!
 }
 
 type GameStartPayload {
-  battles: [Battle!]!
   game: Game!
 }
 
 enum GameState {
+  Attributes
   Battle
   FinalScreen
+  Loading
   Prompt
   Results
   Voting
@@ -149,22 +149,44 @@ enum GameState {
 type GameUserLink {
   SVCModel: SVCModel!
   adlibs: [Adlib!]!
+  battleParticipations: [BattleParticipation!]!
+  battles: [Battle!]!
   game: Game!
+  givenAttributesAuthored: [GivenAttribute!]!
   id: ID!
+  isHost: Boolean!
   user: User!
 }
 
+type GivenAttribute {
+  attribute: String
+  author: GameUserLink!
+  game: Game!
+  id: ID!
+  target: GameUserLink!
+}
+
+input GivenAttributeSubmitInput {
+  attribute: String!
+  givenAttributeId: ID!
+}
+
+type GivenAttributeSubmitPayload {
+  givenAttribute: GivenAttribute!
+}
+
 type Mutation {
-  battleFirstSubmit(input: BattleFirstSubmitInput!): BattleFirstSubmitPayload
+  battleNextActive(input: BattleNextActiveInput!): BattleNextActivePayload
   battleSubmit(input: BattleSubmitInput!): BattleSubmitPayload
 
   """game gets created instantly (and if eMail then invited)"""
   connectToCloudFunc: ConnectToCloudFuncPayload
-  gameCreate(input: GameCreateInput!): GameCreatePayload
+  gameCreate: GameCreatePayload
   gameJoin(input: GameJoinInput!): GameJoinPayload
 
-  """game gets created instantly (and if eMail then invited)"""
+  """start the game"""
   gameStart(input: GameStartInput!): GameStartPayload
+  givenAttributeSubmit(input: GivenAttributeSubmitInput!): GivenAttributeSubmitPayload
 
   """game gets created instantly (and if eMail then invited)"""
   userCreate(input: UserCreateMutationInput!): UserCreatePayload
@@ -180,6 +202,7 @@ type Query {
 
   """code NOT id"""
   game(gameCode: String!): Game
+  gameUserLinkByCode(gameCode: String!): GameUserLink
   user(id: ID!): User
   viewer: User
 }
@@ -209,13 +232,10 @@ scalar Upload
 
 type User {
   avatar: String
-  battlesWhereParticipant: [BattleParticipant!]!
-  deviceId: String!
-  gameUserLink: [GameUserLink!]!
+  battlesWhereParticipant: [BattleParticipation!]!
+  gameUserLinks: [GameUserLink!]!
   id: ID!
-  isHost: Boolean!
   name: String!
-  score: Int!
 }
 
 """User already exists and gets invited"""
@@ -241,7 +261,7 @@ input UserUpdateInput {
 }
 
 type Vote {
-  battleParticipant: BattleParticipant!
+  battleParticipation: BattleParticipation!
   id: ID!
   votee: User!
   voter: User!
@@ -254,12 +274,12 @@ input VoteCreateInput {
 }
 
 input VoteInput {
-  battleParticipantId: ID!
+  battleParticipationId: ID!
   voterId: ID!
 }
 
 type VotePayload {
-  battleParticipant: BattleParticipant!
+  battleParticipation: BattleParticipation!
 }
 
 input VoteUpdateInput {

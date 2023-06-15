@@ -10,6 +10,7 @@ query gamePlayers($gameCode: String!) {
   gameUserLinks {
     id
     SVCModel
+    isHost
     user {
       id
       name

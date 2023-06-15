@@ -3,11 +3,18 @@
   <div>
     <div>HOST</div>
     <div>Code: {{ gameCode.toUpperCase() }}</div>
-    <div v-if="players && players.filter(x => x.name !== 'Host').length > 0">
-      Spieler:
-      <div v-for="player in players?.filter(x => x.name !== 'Host')" :key="player.id">
-        {{ player.name }}
+    <div>
+      <label for="rounds" class="block text-sm font-medium leading-6 text-gray-900">number of rounds:</label>
+      <div class="mt-2">
+        <input id="rounds" v-model="numberOfRoundsInput" type="number" name="rounds" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
       </div>
+    </div>
+    <div v-if="players && players.filter(x => !x.isHost).length > 0">
+      Spieler:
+      <div v-for="player in players?.filter(x => !x.isHost)" :key="player.id">
+        {{ player.user.name }}
+      </div>
+
       <LoadingPinger v-if="loading" />
       <button
         v-else-if="players.length > 1"
@@ -36,13 +43,13 @@ const { gameCode } = defineProps<{
 const { result, loading: gameLoading } = useGamePlayersQuery({ gameCode }, { pollInterval: 1500 })
 const { mutate: startGameMutate, loading: startGameLoading } = useGameStartMutation()
 const loading = computed(() => gameLoading.value || startGameLoading.value)
-
+const numberOfRoundsInput = ref(1)
 function startGame () {
   startGameMutate(
     {
       input: {
         gameCode,
-        numberOfRounds: 1
+        numberOfRounds: numberOfRoundsInput.value
       }
     }
   )
@@ -51,5 +58,5 @@ function startGame () {
     })
 }
 
-const players = computed(() => result.value?.game?.gameUserLinks.map(x => x.user))
+const players = computed(() => result.value?.game?.gameUserLinks)
 </script>

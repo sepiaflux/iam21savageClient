@@ -437,7 +437,7 @@ export type GamePlayersQueryVariables = Exact<{
 }>;
 
 
-export type GamePlayersQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, state: GameState, gameUserLinks: Array<{ __typename?: 'GameUserLink', id: string, SVCModel: SvcModel, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } }> } | null };
+export type GamePlayersQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string, gameCode: string, state: GameState, gameUserLinks: Array<{ __typename?: 'GameUserLink', id: string, SVCModel: SvcModel, isHost: boolean, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } }> } | null };
 
 export type GameUserLinkInfoByCodeQueryVariables = Exact<{
   gameCode: Scalars['String'];
@@ -744,6 +744,7 @@ export const GamePlayersDocument = gql`
     gameUserLinks {
       id
       SVCModel
+      isHost
       user {
         id
         name

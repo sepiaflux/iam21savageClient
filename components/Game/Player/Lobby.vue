@@ -2,10 +2,10 @@
 <template>
   <div>
     <div>Code: {{ gameCode.toUpperCase() }}</div>
-    <div v-if="players && players.filter(x => x.name !== 'Host').length > 0">
+    <div v-if="players && players.filter(x => !x.isHost).length > 0">
       Spieler:
-      <div v-for="player in players?.filter(x => x.name !== 'Host')" :key="player.id">
-        {{ player.name }}
+      <div v-for="player in players?.filter(x => !x.isHost)" :key="player.id">
+        {{ player.user.name }}
       </div>
       <LoadingPinger v-if="loading" />
     </div>
@@ -25,5 +25,5 @@ const { gameCode } = defineProps<{
 const { result, loading: gameLoading } = useGamePlayersQuery({ gameCode }, { pollInterval: 1500 })
 const loading = computed(() => gameLoading.value)
 
-const players = computed(() => result.value?.game?.gameUserLinks.map(x => x.user))
+const players = computed(() => result.value?.game?.gameUserLinks)
 </script>

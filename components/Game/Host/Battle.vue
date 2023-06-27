@@ -4,6 +4,7 @@
     Lädt...
   </div>
   <div v-else>
+    {{ activeParticipation?.participant.user.name }}
     <div class="flex">
       <PictureRound :loading="loading" :url="activeParticipation?.participant.user.avatar" />
     </div>

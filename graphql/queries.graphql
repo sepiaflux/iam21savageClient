@@ -1,32 +1,32 @@
 query gameInfo($gameCode: String!) {
   game(gameCode: $gameCode) {
-  ...GameInfo
+    ...GameInfo
   }
 }
 
 query gamePlayers($gameCode: String!) {
   game(gameCode: $gameCode) {
-  ...GameInfo
-  gameUserLinks {
-    id
-    SVCModel
-    isHost
-    user {
+    ...GameInfo
+    gameUserLinks {
       id
-      name
-      avatar
+      SVCModel
+      isHost
+      user {
+        id
+        name
+        avatar
+      }
     }
   }
-  }
 }
-query gameUserLinkInfoByCode($gameCode: String!){
-  gameUserLinkByCode(gameCode: $gameCode){
+query gameUserLinkInfoByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
     ...GameUserLinkInfo
   }
 }
 
-query gameUserLinkAttributesByCode($gameCode: String!){
-  gameUserLinkByCode(gameCode: $gameCode){
+query gameUserLinkAttributesByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
     id
     givenAttributesAuthored {
       ...GivenAttributeInfo
@@ -34,8 +34,8 @@ query gameUserLinkAttributesByCode($gameCode: String!){
   }
 }
 
-query gameUserLinkBattleParticipationsByCode($gameCode: String!){
-  gameUserLinkByCode(gameCode: $gameCode){
+query gameUserLinkBattleParticipationsByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
     id
     battleParticipations {
       id
@@ -47,25 +47,24 @@ query gameUserLinkBattleParticipationsByCode($gameCode: String!){
           id
           active
         }
-        participations{
+        participations {
           id
-          participant{
+          participant {
             id
             user {
               id
               name
+              avatar
             }
           }
         }
       }
-
-
     }
   }
 }
 
-query gameUserLinkBattlesByCode($gameCode: String!){
-  gameUserLinkByCode(gameCode: $gameCode){
+query gameUserLinkBattlesByCode($gameCode: String!) {
+  gameUserLinkByCode(gameCode: $gameCode) {
     id
     game {
       id
@@ -85,6 +84,7 @@ query gameUserLinkBattlesByCode($gameCode: String!){
               user {
                 id
                 name
+                avatar
               }
             }
           }

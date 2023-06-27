@@ -36,7 +36,6 @@ export type Battle = {
   gameRound: GameRound;
   id: Scalars['ID'];
   participations: Array<BattleParticipation>;
-  votes: Array<Vote>;
 };
 
 export type BattleCreateInput = {
@@ -51,6 +50,7 @@ export type BattleNextActiveInput = {
 
 export type BattleNextActivePayload = {
   __typename?: 'BattleNextActivePayload';
+  game: Game;
   newBattle: Battle;
   oldBattle: Battle;
 };
@@ -118,10 +118,6 @@ export type Game = {
   gameUserLinks: Array<GameUserLink>;
   id: Scalars['ID'];
   state: GameState;
-};
-
-export type GameCreateInput = {
-  numberOfRounds?: InputMaybe<Scalars['Int']>;
 };
 
 export type GameCreatePayload = {
@@ -213,9 +209,6 @@ export type Mutation = {
   /** start the game */
   gameStart?: Maybe<GameStartPayload>;
   givenAttributeSubmit?: Maybe<GivenAttributeSubmitPayload>;
-  /** game gets created instantly (and if eMail then invited) */
-  userCreate?: Maybe<UserCreatePayload>;
-  /** employee gets created instantly (and if eMail then invited) */
   vote?: Maybe<VotePayload>;
 };
 
@@ -245,35 +238,17 @@ export type MutationGivenAttributeSubmitArgs = {
 };
 
 
-export type MutationUserCreateArgs = {
-  input: UserCreateMutationInput;
-};
-
-
 export type MutationVoteArgs = {
   input: VoteInput;
 };
 
 export type Query = {
   __typename?: 'Query';
-  battle?: Maybe<Battle>;
-  battleViewer?: Maybe<Battle>;
-  battles: Array<Battle>;
   /** code NOT id */
   game?: Maybe<Game>;
   gameUserLinkByCode?: Maybe<GameUserLink>;
   user?: Maybe<User>;
   viewer?: Maybe<User>;
-};
-
-
-export type QueryBattleArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryBattleViewerArgs = {
-  userId: Scalars['ID'];
 };
 
 
@@ -332,15 +307,6 @@ export type UserCreateInput = {
   name: Scalars['String'];
 };
 
-export type UserCreateMutationInput = {
-  user: UserCreateInput;
-};
-
-export type UserCreatePayload = {
-  __typename?: 'UserCreatePayload';
-  user: User;
-};
-
 export type UserUpdateInput = {
   avatar?: InputMaybe<Scalars['String']>;
   deviceId?: InputMaybe<Scalars['String']>;
@@ -353,8 +319,7 @@ export type Vote = {
   __typename?: 'Vote';
   battleParticipation: BattleParticipation;
   id: Scalars['ID'];
-  votee: User;
-  voter: User;
+  voter: GameUserLink;
 };
 
 export type VoteCreateInput = {
@@ -365,7 +330,6 @@ export type VoteCreateInput = {
 
 export type VoteInput = {
   battleParticipationId: Scalars['ID'];
-  voterId: Scalars['ID'];
 };
 
 export type VotePayload = {
@@ -381,21 +345,21 @@ export type VoteUpdateInput = {
 
 export type GameInfoFragment = { __typename?: 'Game', id: string, gameCode: string, state: GameState };
 
-export type GameUserLinkInfoFragment = { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } };
+export type GameUserLinkInfoFragment = { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } };
 
 export type GivenAttributeInfoFragment = { __typename?: 'GivenAttribute', id: string, attribute?: string | null, target: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } };
 
 export type GameCreateMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GameCreateMutation = { __typename?: 'Mutation', gameCreate?: { __typename?: 'GameCreatePayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } } } | null };
+export type GameCreateMutation = { __typename?: 'Mutation', gameCreate?: { __typename?: 'GameCreatePayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } } | null };
 
 export type GameJoinMutationVariables = Exact<{
   input: GameJoinInput;
 }>;
 
 
-export type GameJoinMutation = { __typename?: 'Mutation', gameJoin?: { __typename?: 'GameJoinPayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } } } | null };
+export type GameJoinMutation = { __typename?: 'Mutation', gameJoin?: { __typename?: 'GameJoinPayload', token?: string | null, gameUserLink: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } } | null };
 
 export type GameStartMutationVariables = Exact<{
   input: GameStartInput;
@@ -416,7 +380,7 @@ export type BattleSubmitMutationVariables = Exact<{
 }>;
 
 
-export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> } } | null };
+export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> } } | null };
 
 export type BattleNextActiveMutationVariables = Exact<{
   input: BattleNextActiveInput;
@@ -444,7 +408,7 @@ export type GameUserLinkInfoByCodeQueryVariables = Exact<{
 }>;
 
 
-export type GameUserLinkInfoByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string } } | null };
+export type GameUserLinkInfoByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, isHost: boolean, SVCModel: SvcModel, adlibs: Array<Adlib>, game: { __typename?: 'Game', id: string, gameCode: string, state: GameState }, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } | null };
 
 export type GameUserLinkAttributesByCodeQueryVariables = Exact<{
   gameCode: Scalars['String'];
@@ -458,14 +422,14 @@ export type GameUserLinkBattleParticipationsByCodeQueryVariables = Exact<{
 }>;
 
 
-export type GameUserLinkBattleParticipationsByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> } }> } | null };
+export type GameUserLinkBattleParticipationsByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> } }> } | null };
 
 export type GameUserLinkBattlesByCodeQueryVariables = Exact<{
   gameCode: Scalars['String'];
 }>;
 
 
-export type GameUserLinkBattlesByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, game: { __typename?: 'Game', id: string, state: GameState, gameRounds: Array<{ __typename?: 'GameRound', id: string, active: boolean, battles: Array<{ __typename?: 'Battle', id: string, active: boolean, participations: Array<{ __typename?: 'BattleParticipation', id: string, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string } } }> }> }> } } | null };
+export type GameUserLinkBattlesByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, game: { __typename?: 'Game', id: string, state: GameState, gameRounds: Array<{ __typename?: 'GameRound', id: string, active: boolean, battles: Array<{ __typename?: 'Battle', id: string, active: boolean, participations: Array<{ __typename?: 'BattleParticipation', id: string, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> }> }> } } | null };
 
 export const GameInfoFragmentDoc = gql`
     fragment GameInfo on Game {
@@ -484,6 +448,7 @@ export const GameUserLinkInfoFragmentDoc = gql`
   user {
     id
     name
+    avatar
   }
   SVCModel
   adlibs
@@ -642,6 +607,7 @@ export const BattleSubmitDocument = gql`
           user {
             id
             name
+            avatar
           }
         }
       }
@@ -861,6 +827,7 @@ export const GameUserLinkBattleParticipationsByCodeDocument = gql`
             user {
               id
               name
+              avatar
             }
           }
         }
@@ -914,6 +881,7 @@ export const GameUserLinkBattlesByCodeDocument = gql`
               user {
                 id
                 name
+                avatar
               }
             }
           }

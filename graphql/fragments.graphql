@@ -13,6 +13,7 @@ fragment GameUserLinkInfo on GameUserLink {
   user {
     id
     name
+    avatar
   }
   SVCModel
   adlibs

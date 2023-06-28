@@ -14,7 +14,6 @@ type Battle {
   gameRound: GameRound!
   id: ID!
   participations: [BattleParticipation!]!
-  votes: [Vote!]!
 }
 
 input BattleCreateInput {
@@ -28,6 +27,7 @@ input BattleNextActiveInput {
 }
 
 type BattleNextActivePayload {
+  game: Game!
   newBattle: Battle!
   oldBattle: Battle!
 }
@@ -98,10 +98,6 @@ type Game {
   gameUserLinks: [GameUserLink!]!
   id: ID!
   state: GameState!
-}
-
-input GameCreateInput {
-  numberOfRounds: Int
 }
 
 type GameCreatePayload {
@@ -187,19 +183,10 @@ type Mutation {
   """start the game"""
   gameStart(input: GameStartInput!): GameStartPayload
   givenAttributeSubmit(input: GivenAttributeSubmitInput!): GivenAttributeSubmitPayload
-
-  """game gets created instantly (and if eMail then invited)"""
-  userCreate(input: UserCreateMutationInput!): UserCreatePayload
-
-  """employee gets created instantly (and if eMail then invited)"""
   vote(input: VoteInput!): VotePayload
 }
 
 type Query {
-  battle(id: ID!): Battle
-  battleViewer(userId: ID!): Battle
-  battles: [Battle!]!
-
   """code NOT id"""
   game(gameCode: String!): Game
   gameUserLinkByCode(gameCode: String!): GameUserLink
@@ -244,14 +231,6 @@ input UserCreateInput {
   name: String!
 }
 
-input UserCreateMutationInput {
-  user: UserCreateInput!
-}
-
-type UserCreatePayload {
-  user: User!
-}
-
 input UserUpdateInput {
   avatar: String
   deviceId: String
@@ -263,8 +242,7 @@ input UserUpdateInput {
 type Vote {
   battleParticipation: BattleParticipation!
   id: ID!
-  votee: User!
-  voter: User!
+  voter: GameUserLink!
 }
 
 input VoteCreateInput {
@@ -275,7 +253,6 @@ input VoteCreateInput {
 
 input VoteInput {
   battleParticipationId: ID!
-  voterId: ID!
 }
 
 type VotePayload {

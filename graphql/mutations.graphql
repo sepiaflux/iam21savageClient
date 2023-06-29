@@ -43,7 +43,7 @@ mutation battleSubmit($input: BattleSubmitInput!) {
       participations {
         id
         openAIFirstPart
-        userMiddlePart
+        userRapLines
         participant {
           id
           user {

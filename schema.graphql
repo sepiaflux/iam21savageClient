@@ -40,7 +40,7 @@ type BattleParticipation {
   openAIFirstPart: String
   participant: GameUserLink!
   rapText: String
-  userMiddlePart: String
+  userRapLines: [String!]!
   votes: [Vote!]!
 }
 
@@ -52,7 +52,7 @@ input BattleParticipationCreateInput {
   openAIFirstPart: String
   participantId: ID!
   rapText: String
-  userMiddlePart: String
+  userRapLines: [String!]!
 }
 
 input BattleParticipationUpdateInput {
@@ -63,12 +63,12 @@ input BattleParticipationUpdateInput {
   openAIFirstPart: String
   participantId: ID
   rapText: String
-  userMiddlePart: String
+  userRapLines: [String!]!
 }
 
 input BattleSubmitInput {
   battleId: ID!
-  middlePart: String!
+  userRapLines: [String!]!
 }
 
 type BattleSubmitPayload {

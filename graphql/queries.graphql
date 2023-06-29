@@ -40,7 +40,7 @@ query gameUserLinkBattleParticipationsByCode($gameCode: String!) {
     battleParticipations {
       id
       openAIFirstPart
-      userMiddlePart
+      userRapLines
       battle {
         id
         gameRound {

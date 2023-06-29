@@ -64,7 +64,7 @@ export type BattleParticipation = {
   openAIFirstPart?: Maybe<Scalars['String']>;
   participant: GameUserLink;
   rapText?: Maybe<Scalars['String']>;
-  userMiddlePart?: Maybe<Scalars['String']>;
+  userRapLines: Array<Scalars['String']>;
   votes: Array<Vote>;
 };
 
@@ -76,7 +76,7 @@ export type BattleParticipationCreateInput = {
   openAIFirstPart?: InputMaybe<Scalars['String']>;
   participantId: Scalars['ID'];
   rapText?: InputMaybe<Scalars['String']>;
-  userMiddlePart?: InputMaybe<Scalars['String']>;
+  userRapLines: Array<Scalars['String']>;
 };
 
 export type BattleParticipationUpdateInput = {
@@ -87,12 +87,12 @@ export type BattleParticipationUpdateInput = {
   openAIFirstPart?: InputMaybe<Scalars['String']>;
   participantId?: InputMaybe<Scalars['ID']>;
   rapText?: InputMaybe<Scalars['String']>;
-  userMiddlePart?: InputMaybe<Scalars['String']>;
+  userRapLines: Array<Scalars['String']>;
 };
 
 export type BattleSubmitInput = {
   battleId: Scalars['ID'];
-  middlePart: Scalars['String'];
+  userRapLines: Array<Scalars['String']>;
 };
 
 export type BattleSubmitPayload = {
@@ -380,7 +380,7 @@ export type BattleSubmitMutationVariables = Exact<{
 }>;
 
 
-export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> } } | null };
+export type BattleSubmitMutation = { __typename?: 'Mutation', battleSubmit?: { __typename?: 'BattleSubmitPayload', battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userRapLines: Array<string>, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> } } | null };
 
 export type BattleNextActiveMutationVariables = Exact<{
   input: BattleNextActiveInput;
@@ -422,7 +422,7 @@ export type GameUserLinkBattleParticipationsByCodeQueryVariables = Exact<{
 }>;
 
 
-export type GameUserLinkBattleParticipationsByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userMiddlePart?: string | null, battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> } }> } | null };
+export type GameUserLinkBattleParticipationsByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, battleParticipations: Array<{ __typename?: 'BattleParticipation', id: string, openAIFirstPart?: string | null, userRapLines: Array<string>, battle: { __typename?: 'Battle', id: string, gameRound: { __typename?: 'GameRound', id: string, active: boolean }, participations: Array<{ __typename?: 'BattleParticipation', id: string, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> } }> } | null };
 
 export type GameUserLinkBattlesByCodeQueryVariables = Exact<{
   gameCode: Scalars['String'];
@@ -601,7 +601,7 @@ export const BattleSubmitDocument = gql`
       participations {
         id
         openAIFirstPart
-        userMiddlePart
+        userRapLines
         participant {
           id
           user {
@@ -813,7 +813,7 @@ export const GameUserLinkBattleParticipationsByCodeDocument = gql`
     battleParticipations {
       id
       openAIFirstPart
-      userMiddlePart
+      userRapLines
       battle {
         id
         gameRound {

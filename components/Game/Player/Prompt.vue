@@ -15,7 +15,7 @@
       <label for="attribute-input" class="block text-sm font-medium leading-6 text-gray-900">
         You are in a rap battle against {{ opponent.name }}! <br>
         Complete the following lines: <br>
-        {{ openAIFirstPartLines.split("\n").slice(0, 3).join("\n") }} <!-- Displays first 3 lines -->
+        {{ activeParticipation.openAIFirstPart?.split("\n").slice(0, 3).join("\n") }} <!-- Displays first 3 lines -->
       </label>
       <div class="mt-1">
         <input
@@ -27,7 +27,7 @@
           class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
         >
       </div>
-      {{ openAIFirstPartLines.split("\n").slice(4, 7).join("\n") }} <!-- Displays lines 5 to 7 -->
+      {{ activeParticipation.openAIFirstPart?.split("\n").slice(4, 7).join("\n") }} <!-- Displays lines 5 to 7 -->
       <div class="mt-1">
         <input
           id="attribute-input2"
@@ -60,12 +60,15 @@ const { gameCode } = defineProps<{
 
 const { result, loading: queryLoading } = useGameUserLinkBattleParticipationsByCodeQuery({ gameCode }, { pollInterval: 15000 })
 const { mutate, loading: mutateLoading } = useBattleSubmitMutation({})
+
 const loading = computed(() => queryLoading.value || mutateLoading.value)
 const textInput = ref('')
 const textInput2 = ref('')
 const activeParticipation = computed(() => result.value?.gameUserLinkByCode?.battleParticipations?.find(x => x.battle.gameRound.active))
 const opponent = computed(() => activeParticipation.value?.battle.participations.find(x => x.id !== activeParticipation.value?.id)?.participant.user)
-const activeParticipationDone = computed(() => !!activeParticipation.value?.userRapLines)
+const activeParticipationDone = computed(() => {
+  return activeParticipation.value?.userRapLines && activeParticipation.value.userRapLines.length >= 2
+})
 function submitBattle () {
   if (!textInput.value || !textInput2.value) {
     alert('Bitte gib etwas ein!')

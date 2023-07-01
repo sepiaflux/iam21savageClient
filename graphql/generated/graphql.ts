@@ -59,6 +59,8 @@ export type BattleParticipation = {
   __typename?: 'BattleParticipation';
   /** we use a service for this so this is the link to that service */
   audioURL?: Maybe<Scalars['String']>;
+  avatarVideoId?: Maybe<Scalars['String']>;
+  avatarVideoURL?: Maybe<Scalars['String']>;
   battle: Battle;
   id: Scalars['ID'];
   openAIFirstPart?: Maybe<Scalars['String']>;
@@ -429,7 +431,7 @@ export type GameUserLinkBattlesByCodeQueryVariables = Exact<{
 }>;
 
 
-export type GameUserLinkBattlesByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, game: { __typename?: 'Game', id: string, state: GameState, gameRounds: Array<{ __typename?: 'GameRound', id: string, active: boolean, battles: Array<{ __typename?: 'Battle', id: string, active: boolean, participations: Array<{ __typename?: 'BattleParticipation', id: string, rapText?: string | null, audioURL?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> }> }> } } | null };
+export type GameUserLinkBattlesByCodeQuery = { __typename?: 'Query', gameUserLinkByCode?: { __typename?: 'GameUserLink', id: string, game: { __typename?: 'Game', id: string, state: GameState, gameRounds: Array<{ __typename?: 'GameRound', id: string, active: boolean, battles: Array<{ __typename?: 'Battle', id: string, active: boolean, participations: Array<{ __typename?: 'BattleParticipation', id: string, rapText?: string | null, audioURL?: string | null, avatarVideoURL?: string | null, participant: { __typename?: 'GameUserLink', id: string, user: { __typename?: 'User', id: string, name: string, avatar?: string | null } } }> }> }> } } | null };
 
 export const GameInfoFragmentDoc = gql`
     fragment GameInfo on Game {
@@ -876,6 +878,7 @@ export const GameUserLinkBattlesByCodeDocument = gql`
             id
             rapText
             audioURL
+            avatarVideoURL
             participant {
               id
               user {

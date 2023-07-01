@@ -35,6 +35,8 @@ type BattleNextActivePayload {
 type BattleParticipation {
   """we use a service for this so this is the link to that service"""
   audioURL: String
+  avatarVideoId: String
+  avatarVideoURL: String
   battle: Battle!
   id: ID!
   openAIFirstPart: String

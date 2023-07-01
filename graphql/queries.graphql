@@ -79,6 +79,7 @@ query gameUserLinkBattlesByCode($gameCode: String!) {
             id
             rapText
             audioURL
+            avatarVideoURL
             participant {
               id
               user {

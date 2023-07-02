@@ -9,7 +9,7 @@
       <PictureRound :loading="loading" :url="activeParticipation?.participant.user.avatar" />
     </div>
     <div class="flex">
-      <video v-if="activeParticipation?.avatarVideoURL" :src="activeParticipation?.avatarVideoURL" autoplay />
+      <video v-if="activeParticipation?.avatarVideoURL" :src="activeParticipation?.avatarVideoURL" controls autoplay />
     </div>
     <!-- <div @click="activeParticipation?.audioURL ? playSound(activeParticipation.audioURL) : undefined"> -->
     {{ activeParticipation?.rapText }}

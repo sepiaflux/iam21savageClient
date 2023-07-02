@@ -11,9 +11,9 @@
     <div class="flex">
       <video v-if="activeParticipation?.avatarVideoURL" :src="activeParticipation?.avatarVideoURL" autoplay />
     </div>
-    <div @click="activeParticipation?.audioURL ? playSound(activeParticipation.audioURL) : undefined">
-      {{ activeParticipation?.rapText }}
-    </div>
+    <!-- <div @click="activeParticipation?.audioURL ? playSound(activeParticipation.audioURL) : undefined"> -->
+    {{ activeParticipation?.rapText }}
+    <!-- </div> -->
     <div v-if="firstPerson" class="text-gray-600 mt-12" @click="firstPerson = false">
       Next Person in this battle
     </div>
@@ -43,15 +43,15 @@ const activeParticipation = computed(() => firstPerson.value ? activeBattle.valu
 const playingAudio = ref<HTMLAudioElement|undefined>()
 const numberOfInactiveBattles = computed(() => activeRound.value?.battles.filter(x => !x.active).length)
 
-function playSound (url: string) {
-  if (playingAudio.value) {
-    playingAudio.value.pause()
-  }
-  const audio = new Audio(url)
-  playingAudio.value = audio
-  audio.play()
-  return audio
-}
+// function playSound (url: string) {
+//   if (playingAudio.value) {
+//     playingAudio.value.pause()
+//   }
+//   const audio = new Audio(url)
+//   playingAudio.value = audio
+//   audio.play()
+//   return audio
+// }
 
 function handleAudioEnded () {
   if (firstPerson.value) {
@@ -71,24 +71,24 @@ watch(activeBattle, (val, oldVal) => {
     firstPerson.value = true
   }
 })
-watch(activeParticipation, (val, oldVal) => {
-  if (val && !oldVal && !playingAudio.value) {
-    if (!val.audioURL) {
-      alert('no audio url')
-      return
-    }
-    const audio = playSound(val.audioURL)
-    audio.onended = handleAudioEnded
-  }
-  if (val && oldVal && val.id !== oldVal.id) {
-    if (!val.audioURL) {
-      alert('no audio url')
-      return
-    }
-    const audio = playSound(val.audioURL)
-    audio.onended = handleAudioEnded
-  }
-}, { immediate: true })
+// watch(activeParticipation, (val, oldVal) => {
+//   if (val && !oldVal && !playingAudio.value) {
+//     if (!val.audioURL) {
+//       alert('no audio url')
+//       return
+//     }
+//     const audio = playSound(val.audioURL)
+//     audio.onended = handleAudioEnded
+//   }
+//   if (val && oldVal && val.id !== oldVal.id) {
+//     if (!val.audioURL) {
+//       alert('no audio url')
+//       return
+//     }
+//     const audio = playSound(val.audioURL)
+//     audio.onended = handleAudioEnded
+//   }
+// }, { immediate: true })
 
 function activateNextBattle () {
   if (activeBattle.value) {
